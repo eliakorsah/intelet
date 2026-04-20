@@ -1,28 +1,26 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import NetworkAnimation from './NetworkAnimation'
+import { COMPANY, COLORS, FEATURED_PROMO, whatsappLink } from '@/lib/brand'
 
-const TEAL = '#00d4aa'
+const RED      = COLORS.red
+const RED_DEEP = COLORS.redDeep
+const BLUE     = COLORS.blue
 
-const slides = [
-  '/heroproducts/1_0_01_04_40077_399911328-Black_crop_thumb.png',
-  '/heroproducts/1_0_01_07_15908_729347164_crop_thumb.png',
-  '/heroproducts/1_0_01_07_15908_729347579_crop_thumb.png',
-  '/heroproducts/1_0_01_21_10315_528077270_crop_thumb.png',
-  '/heroproducts/1_0_01_21_10315_528077271_crop_thumb.png',
-  '/heroproducts/DS-2CD2T47G2-L_image_1.png',
-  '/heroproducts/DS-2CD2T47G2-L_image_3.png',
-  '/heroproducts/b1.jpg',
-  '/heroproducts/OII (2).png',
-  '/heroproducts/OIO (2).png',
-]
+// Slides drawn from the featured Grand-Opening promo products.
+const slides = FEATURED_PROMO.map(p => ({ src: p.image, label: p.name }))
 
 const IconArrow = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+  </svg>
+)
+const IconTag = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+    <circle cx="7.5" cy="7.5" r="1.5"/>
   </svg>
 )
 const IconShield = () => (
@@ -30,16 +28,10 @@ const IconShield = () => (
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
   </svg>
 )
-const IconCamera = () => (
+const IconTruck = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
-    <circle cx="12" cy="13" r="3"/>
-  </svg>
-)
-const IconWifi = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/>
-    <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/>
+    <path d="M10 17h4V5H2v12h3"/><path d="M20 17h2v-4l-3-4h-5v8h2"/>
+    <circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
   </svg>
 )
 const IconChevronDown = () => (
@@ -49,27 +41,9 @@ const IconChevronDown = () => (
 )
 
 export default function HeroSection() {
-  const videoRef                      = useRef<HTMLVideoElement>(null)
-  const [mounted,      setMounted]    = useState(false)
-  const [videoReady,   setVideoReady] = useState(false)
-  const [videoError,   setVideoError] = useState(false)
   const [current, setCurrent] = useState(0)
   const [prev,    setPrev]    = useState<number | null>(null)
 
-  useEffect(() => { setMounted(true) }, [])
-
-  useEffect(() => {
-    if (!mounted) return
-    const v = videoRef.current
-    if (!v) return
-    v.muted = true; v.playsInline = true; v.loop = true
-    const tryPlay = () => v.play().catch(() => setVideoError(true))
-    if (v.readyState >= 3) tryPlay()
-    else v.addEventListener('canplay', tryPlay, { once: true })
-    return () => v.removeEventListener('canplay', tryPlay)
-  }, [mounted])
-
-  // Auto-advance slideshow
   useEffect(() => {
     const timer = setInterval(() => {
       setPrev(current)
@@ -80,195 +54,270 @@ export default function HeroSection() {
   }, [current])
 
   return (
-    <section className="relative min-h-screen flex flex-col overflow-hidden" style={{ backgroundColor: '#03070f' }}>
+    <section
+      className="relative min-h-[92vh] flex flex-col overflow-hidden"
+      style={{ backgroundColor: COLORS.ash }}
+    >
+      {/* ── Light background: ash + red blend ───────────── */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `
+            radial-gradient(ellipse 80% 55% at 85% 10%, ${COLORS.redSoft} 0%, transparent 60%),
+            radial-gradient(ellipse 70% 50% at 10% 95%, ${COLORS.redSoft} 0%, transparent 55%),
+            linear-gradient(180deg, ${COLORS.white} 0%, ${COLORS.ash} 100%)
+          `,
+        }}
+      />
 
-      {/* ── Background ───────────────────────────────── */}
-      <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 80% 60% at 50% 40%, #060d1a 0%, #03070f 100%)'
-      }} />
+      {/* Diagonal red streak */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: '30%', right: '-10%', width: '55%', height: '3px',
+          background: `linear-gradient(to left, transparent, ${RED} 50%, transparent)`,
+          transform: 'rotate(-14deg)', filter: 'blur(1px)', opacity: 0.5,
+        }}
+      />
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: '62%', left: '-10%', width: '55%', height: '3px',
+          background: `linear-gradient(to right, transparent, ${BLUE} 50%, transparent)`,
+          transform: 'rotate(-10deg)', filter: 'blur(1px)', opacity: 0.35,
+        }}
+      />
 
-      {/* Central glow orb */}
-      <div className="absolute pointer-events-none" style={{
-        top: '18%', left: '30%', transform: 'translateX(-50%)',
-        width: '320px', height: '320px',
-        background: 'radial-gradient(circle, rgba(120,80,255,0.35) 0%, rgba(60,120,255,0.2) 30%, transparent 70%)',
-        filter: 'blur(40px)',
-      }} />
-      <div className="absolute pointer-events-none" style={{
-        top: '25%', left: '30%', transform: 'translateX(-50%)',
-        width: '180px', height: '180px',
-        background: 'radial-gradient(circle, rgba(0,212,170,0.25) 0%, transparent 70%)',
-        filter: 'blur(20px)',
-      }} />
-
-      {/* Light streaks */}
-      {[
-        { rotate: '-28deg', color: 'rgba(0,180,255,0.45)',  width: '45%', top: '42%', left: '-5%',  origin: '100% 50%', dir: 'right' },
-        { rotate: '-16deg', color: 'rgba(130,80,255,0.35)', width: '40%', top: '48%', left: '-5%',  origin: '100% 50%', dir: 'right' },
-        { rotate: '-8deg',  color: 'rgba(0,212,170,0.25)',  width: '38%', top: '53%', left: '-5%',  origin: '100% 50%', dir: 'right' },
-        { rotate: '28deg',  color: 'rgba(0,180,255,0.45)',  width: '45%', top: '42%', right: '-5%', origin: '0% 50%',   dir: 'left'  },
-        { rotate: '16deg',  color: 'rgba(130,80,255,0.35)', width: '40%', top: '48%', right: '-5%', origin: '0% 50%',   dir: 'left'  },
-        { rotate: '8deg',   color: 'rgba(0,212,170,0.25)',  width: '38%', top: '53%', right: '-5%', origin: '0% 50%',   dir: 'left'  },
-      ].map((ray, i) => (
-        <div key={i} className="absolute pointer-events-none" style={{
-          top: ray.top,
-          ...('left' in ray ? { left: ray.left } : { right: (ray as any).right }),
-          width: ray.width, height: '2px',
-          background: `linear-gradient(to ${ray.dir}, transparent, ${ray.color} 50%, transparent)`,
-          transform: `rotate(${ray.rotate})`,
-          transformOrigin: ray.origin,
-          filter: 'blur(2px)',
-        }} />
-      ))}
-
-      <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{
-        height: '35%',
-        background: 'linear-gradient(to top, rgba(0,80,160,0.12) 0%, transparent 100%)',
-      }} />
-
-      {/* Video */}
-      {mounted && !videoError && (
-        <div className="absolute inset-0">
-          <video ref={videoRef} loop muted playsInline preload="auto"
-            onCanPlay={() => setVideoReady(true)} onError={() => setVideoError(true)}
-            className="w-full h-full object-cover"
-            style={{ opacity: videoReady ? 0.12 : 0, transition: 'opacity 1.5s ease' }}>
-            <source src="/hero-video.mp4" type="video/mp4" />
-          </video>
-        </div>
-      )}
-
-      {/* Network dots */}
-      <div className="absolute inset-0" style={{ opacity: 0.2 }}>
-        <NetworkAnimation />
-      </div>
-
-      {/* Corner brackets */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[
-          { top: '5rem',    left: '2rem',  borderTop: '2px solid rgba(0,212,170,0.35)', borderLeft: '2px solid rgba(0,212,170,0.35)' },
-          { top: '5rem',    right: '2rem', borderTop: '2px solid rgba(0,212,170,0.35)', borderRight: '2px solid rgba(0,212,170,0.35)' },
-          { bottom: '8rem', left: '2rem',  borderBottom: '2px solid rgba(0,212,170,0.35)', borderLeft: '2px solid rgba(0,212,170,0.35)' },
-          { bottom: '8rem', right: '2rem', borderBottom: '2px solid rgba(0,212,170,0.35)', borderRight: '2px solid rgba(0,212,170,0.35)' },
-        ].map((s, i) => <div key={i} className="absolute w-12 h-12" style={s} />)}
-      </div>
+      {/* Faint grid overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(200,16,46,0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(200,16,46,0.05) 1px, transparent 1px)
+          `,
+          backgroundSize: '56px 56px',
+          maskImage: 'radial-gradient(ellipse 80% 70% at 50% 40%, black, transparent)',
+          WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at 50% 40%, black, transparent)',
+        }}
+      />
 
       {/* ── Two-column content ───────────────────────── */}
       <div className="relative z-10 flex-1 flex items-center">
-        <div className="w-full max-w-7xl mx-auto px-6 py-24">
+        <div className="w-full max-w-7xl mx-auto px-6 py-20 lg:py-24">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
             {/* ── LEFT: Text ── */}
             <div style={{ animation: 'fadeRightSpring 0.8s cubic-bezier(0.22,1,0.36,1) 0.05s both' }}>
 
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 mb-8 px-5 py-2 rounded-full border"
+              {/* Grand Opening badge */}
+              <div
+                className="inline-flex items-center gap-2 mb-6 px-5 py-2 rounded-full"
                 style={{
-                  background: 'rgba(0,212,170,0.08)', borderColor: 'rgba(0,212,170,0.25)',
+                  background: RED, color: COLORS.white,
+                  boxShadow: `0 10px 30px -10px ${RED}`,
                   animation: 'heroBadge 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s both',
-                }}>
-                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: TEAL }} />
-                <span className="font-mono text-xs tracking-widest" style={{ color: TEAL }}>
-                  GHANA&apos;S PREMIER IT SOLUTIONS PROVIDER
+                }}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                <span className="font-mono text-xs tracking-widest">
+                  {COMPANY.grandOpening.headline} · {COMPANY.grandOpening.label}
                 </span>
               </div>
 
               {/* Headline */}
-              <h1 className="font-heading font-black text-white leading-none mb-6"
+              <h1
+                className="font-heading font-black leading-[0.95] mb-5"
                 style={{
-                  fontSize: 'clamp(2.4rem, 5.5vw, 4.8rem)', letterSpacing: '-0.02em',
+                  color: COLORS.ink,
+                  fontSize: 'clamp(2.4rem, 5.5vw, 4.8rem)',
+                  letterSpacing: '-0.02em',
                   animation: 'heroTitle 0.9s cubic-bezier(0.22,1,0.36,1) 0.22s both',
-                }}>
-                Securing Ghana&apos;s<br />
-                <span style={{
-                  color: TEAL,
-                  textShadow: '0 0 60px rgba(0,212,170,0.5), 0 0 120px rgba(0,212,170,0.2)',
-                }}>
-                  Digital Future
+                }}
+              >
+                Unbeatable{' '}
+                <span
+                  style={{
+                    background: `linear-gradient(90deg, ${RED} 0%, ${RED_DEEP} 100%)`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}
+                >
+                  DISCOUNTS
                 </span>
+                <br />
+                on Home Appliances
               </h1>
 
               {/* Subtext */}
-              <p className="text-white/60 text-base max-w-lg mb-10 leading-relaxed font-light"
-                style={{ animation: 'fadeUpSpring 0.8s cubic-bezier(0.22,1,0.36,1) 0.38s both' }}>
-                Over <strong className="text-white/90 font-semibold">20 years</strong> delivering premium CCTV,
-                access control, networking and IT equipment across Ghana and beyond.
+              <p
+                className="text-base md:text-lg max-w-lg mb-8 leading-relaxed"
+                style={{
+                  color: COLORS.inkSoft,
+                  animation: 'fadeUpSpring 0.8s cubic-bezier(0.22,1,0.36,1) 0.38s both',
+                }}
+              >
+                {COMPANY.name} is open at{' '}
+                <strong style={{ color: COLORS.ink }}>{COMPANY.address.line1}</strong> — next to MTN on the N1 Highway.
+                Fridges, freezers, washing machines, ACs &amp; TVs from Samsung, Midea, Bruhm, Tamashi, TCL, NASCO &amp; Haier —
+                every unit backed by a <strong style={{ color: RED }}>12-month warranty</strong>.
               </p>
 
               {/* Pills */}
               <div className="flex flex-wrap gap-3 mb-10">
                 {[
-                  { icon: <IconCamera />, label: 'CCTV & Security' },
-                  { icon: <IconWifi />,   label: 'Networking' },
-                  { icon: <IconShield />, label: 'Access Control' },
+                  { icon: <IconTag />,    label: 'Grand Opening Prices' },
+                  { icon: <IconShield />, label: '12-Month Warranty' },
+                  { icon: <IconTruck />,  label: 'Delivery Available' },
                 ].map(({ icon, label }, i) => (
-                  <div key={label}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full border"
+                  <div
+                    key={label}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full"
                     style={{
-                      background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.12)',
+                      background: COLORS.white,
+                      border: `1px solid ${COLORS.ashLine}`,
                       animation: `heroPills 0.6s cubic-bezier(0.22,1,0.36,1) ${0.52 + i * 0.08}s both`,
-                      transition: 'background 0.3s ease, border-color 0.3s ease',
-                    }}>
-                    <span style={{ color: TEAL, display: 'flex' }}>{icon}</span>
-                    <span className="text-sm font-heading font-semibold tracking-wide text-white/70">{label}</span>
+                    }}
+                  >
+                    <span style={{ color: RED, display: 'flex' }}>{icon}</span>
+                    <span className="text-sm font-heading font-semibold tracking-wide" style={{ color: COLORS.ink }}>
+                      {label}
+                    </span>
                   </div>
                 ))}
               </div>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-4"
-                style={{ animation: 'fadeUpSpring 0.7s cubic-bezier(0.22,1,0.36,1) 0.72s both' }}>
-                <Link href="/products"
-                  className="btn-shimmer inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-heading font-bold tracking-wide text-white text-base active:scale-95"
+              <div
+                className="flex flex-col sm:flex-row gap-4"
+                style={{ animation: 'fadeUpSpring 0.7s cubic-bezier(0.22,1,0.36,1) 0.72s both' }}
+              >
+                <Link
+                  href="/products"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-heading font-bold tracking-wide text-white text-base active:scale-95"
                   style={{
-                    backgroundColor: TEAL,
+                    background: `linear-gradient(90deg, ${RED} 0%, ${RED_DEEP} 100%)`,
+                    boxShadow: `0 15px 40px -15px ${RED}`,
                     transition: 'box-shadow 0.35s ease, transform 0.2s cubic-bezier(0.22,1,0.36,1)',
                   }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 0 32px rgba(0,212,170,0.5)' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.boxShadow = 'none' }}>
-                  EXPLORE PRODUCTS <IconArrow />
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.boxShadow = `0 0 36px ${RED}80` }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.boxShadow = `0 15px 40px -15px ${RED}` }}
+                >
+                  SHOP THE PROMO <IconArrow />
                 </Link>
-                <a href="https://wa.me/233555517658?text=Hello%2C%20I%20would%20like%20a%20FREE%20consultation"
+                <a
+                  href={whatsappLink()}
                   target="_blank" rel="noopener noreferrer"
-                  className="btn-shimmer inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-heading font-bold tracking-wide text-white text-base active:scale-95 border"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-heading font-bold tracking-wide text-base active:scale-95"
                   style={{
-                    borderColor: 'rgba(255,255,255,0.25)', background: 'rgba(255,255,255,0.05)',
-                    transition: 'background 0.3s ease, border-color 0.3s ease, transform 0.2s cubic-bezier(0.22,1,0.36,1)',
-                  }}>
-                  FREE CONSULTATION
+                    border: `2px solid ${RED}`,
+                    background: COLORS.white,
+                    color: RED,
+                    transition: 'background 0.3s ease, color 0.3s ease',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLAnchorElement).style.background = RED
+                    ;(e.currentTarget as HTMLAnchorElement).style.color = COLORS.white
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLAnchorElement).style.background = COLORS.white
+                    ;(e.currentTarget as HTMLAnchorElement).style.color = RED
+                  }}
+                >
+                  WHATSAPP US
                 </a>
               </div>
             </div>
 
-            {/* ── RIGHT: Image Slideshow ── */}
-            <div className="hidden lg:flex items-center justify-center"
-              style={{ animation: 'fadeLeftSpring 0.9s cubic-bezier(0.22,1,0.36,1) 0.35s both' }}>
-
-              <div style={{ position: 'relative', width: '100%', maxWidth: '480px', aspectRatio: '1/1' }}>
-                {slides.map((src, i) => {
+            {/* ── RIGHT: Appliance slideshow ── */}
+            <div
+              className="hidden lg:flex items-center justify-center"
+              style={{ animation: 'fadeLeftSpring 0.9s cubic-bezier(0.22,1,0.36,1) 0.35s both' }}
+            >
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  maxWidth: '520px',
+                  aspectRatio: '1/1',
+                  borderRadius: '24px',
+                  background: `radial-gradient(circle at 50% 40%, ${COLORS.white} 0%, ${COLORS.ash} 75%)`,
+                  border: `1px solid ${COLORS.ashLine}`,
+                  boxShadow: `0 40px 80px -40px ${RED}66`,
+                  overflow: 'hidden',
+                }}
+              >
+                {slides.map((s, i) => {
                   const isActive = i === current
                   const isPrev   = i === prev
                   return (
-                    <div key={src} style={{
-                      position: 'absolute', inset: 0,
-                      opacity: isActive ? 1 : 0,
-                      transform: isActive ? 'scale(1)' : isPrev ? 'scale(1.06)' : 'scale(0.96)',
-                      transition: 'opacity 0.85s cubic-bezier(0.22,1,0.36,1), transform 0.85s cubic-bezier(0.22,1,0.36,1)',
-                      zIndex: isActive ? 2 : isPrev ? 1 : 0,
-                    }}>
+                    <div
+                      key={s.src}
+                      style={{
+                        position: 'absolute', inset: 24,
+                        opacity: isActive ? 1 : 0,
+                        transform: isActive ? 'scale(1)' : isPrev ? 'scale(1.06)' : 'scale(0.96)',
+                        transition: 'opacity 0.85s cubic-bezier(0.22,1,0.36,1), transform 0.85s cubic-bezier(0.22,1,0.36,1)',
+                        zIndex: isActive ? 2 : isPrev ? 1 : 0,
+                      }}
+                    >
                       <Image
-                        src={src}
-                        alt={`product-${i}`}
+                        src={s.src}
+                        alt={s.label}
                         fill
                         className="object-contain"
-                        sizes="480px"
+                        sizes="520px"
                         priority={i === 0}
                       />
                     </div>
                   )
                 })}
-              </div>
 
+                {/* Floating % off sticker */}
+                <div
+                  className="absolute font-heading font-black text-white flex flex-col items-center justify-center"
+                  style={{
+                    top: '20px', right: '20px', width: '92px', height: '92px',
+                    borderRadius: '50%',
+                    background: `linear-gradient(135deg, ${RED} 0%, ${RED_DEEP} 100%)`,
+                    boxShadow: `0 12px 30px -8px ${RED}`,
+                    transform: 'rotate(-8deg)',
+                    zIndex: 3,
+                  }}
+                >
+                  <span className="text-[10px] tracking-[0.18em] opacity-90">UP TO</span>
+                  <span className="text-2xl leading-none">40%</span>
+                  <span className="text-[10px] tracking-[0.18em] opacity-90">OFF</span>
+                </div>
+
+                {/* Label ribbon */}
+                <div
+                  className="absolute left-6 right-6 bottom-6 flex items-center justify-between px-4 py-3 rounded-xl"
+                  style={{ background: COLORS.white, border: `1px solid ${COLORS.ashLine}`, zIndex: 3 }}
+                >
+                  <div>
+                    <div className="text-[10px] font-mono tracking-[0.18em]" style={{ color: COLORS.inkMuted }}>
+                      GRAND OPENING FEATURED
+                    </div>
+                    <div className="text-sm font-heading font-bold" style={{ color: COLORS.ink }}>
+                      {slides[current]?.label}
+                    </div>
+                  </div>
+                  <div className="flex gap-1.5">
+                    {slides.map((_, i) => (
+                      <span
+                        key={i}
+                        style={{
+                          width: i === current ? 18 : 6, height: 6, borderRadius: 4,
+                          background: i === current ? RED : COLORS.ashLine,
+                          transition: 'all 0.35s ease',
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -276,11 +325,10 @@ export default function HeroSection() {
       </div>
 
       {/* Scroll cue */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 animate-bounce">
-        <span className="text-[10px] text-white/30 font-mono tracking-[0.25em]">SCROLL</span>
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 animate-bounce" style={{ color: COLORS.inkMuted }}>
+        <span className="text-[10px] font-mono tracking-[0.25em]">SCROLL</span>
         <IconChevronDown />
       </div>
-
     </section>
   )
 }

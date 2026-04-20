@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { COLORS } from '@/lib/brand'
 
-const TEAL = '#00c49a'
+const RED = COLORS.red
 
 interface Props { images: string[]; title: string }
 
@@ -13,7 +14,7 @@ export default function ProductImageGallery({ images, title }: Props) {
 
   if (!images.length) {
     return (
-      <div className="aspect-[4/3] rounded-2xl bg-gray-100 flex items-center justify-center text-gray-300 text-6xl">
+      <div className="aspect-[4/3] rounded-2xl bg-[#F5F4F2] flex items-center justify-center text-gray-300 text-6xl">
         📦
       </div>
     )
@@ -23,7 +24,7 @@ export default function ProductImageGallery({ images, title }: Props) {
     <div className="flex flex-col gap-3 lg:sticky lg:top-24">
       {/* Main image */}
       <div
-        className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100 cursor-zoom-in"
+        className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-[#F5F4F2] cursor-zoom-in"
         onClick={() => setZoomed(true)}
       >
         <Image
@@ -54,7 +55,7 @@ export default function ProductImageGallery({ images, title }: Props) {
             <button key={i} onClick={() => setActive(i)}
               className="relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden transition-all duration-200"
               style={{
-                border: `2px solid ${i === active ? TEAL : '#e5e7eb'}`,
+                border: `2px solid ${i === active ? RED : COLORS.ashLine}`,
                 opacity: i === active ? 1 : 0.65,
               }}>
               <Image src={img} alt={`${title} ${i + 1}`} fill className="object-cover" sizes="64px" />

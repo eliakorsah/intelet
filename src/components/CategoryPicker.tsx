@@ -5,7 +5,9 @@ import { supabase } from '@/lib/supabase'
 import type { Category } from '@/lib/categories'
 import { getChildren } from '@/lib/categories'
 
-const TEAL = '#00c49a'
+import { COLORS } from '@/lib/brand'
+
+const RED = COLORS.red
 
 const IconPlus = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -97,7 +99,7 @@ export default function CategoryPicker({ value, onChange }: Props) {
             {roots.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
           <button type="button" onClick={() => { setAdding('l1'); setNewName('') }}
-            style={{ padding: '8px 10px', borderRadius: '10px', border: '1px solid #e5e7eb', background: '#f7f8fc', cursor: 'pointer', color: TEAL, flexShrink: 0 }}>
+            style={{ padding: '8px 10px', borderRadius: '10px', border: '1px solid #e5e7eb', background: '#f7f8fc', cursor: 'pointer', color: RED, flexShrink: 0 }}>
             <IconPlus />
           </button>
         </div>
@@ -118,7 +120,7 @@ export default function CategoryPicker({ value, onChange }: Props) {
               {subs.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
             <button type="button" onClick={() => { setAdding('l2'); setNewName('') }}
-              style={{ padding: '8px 10px', borderRadius: '10px', border: '1px solid #e5e7eb', background: '#f7f8fc', cursor: 'pointer', color: TEAL, flexShrink: 0 }}>
+              style={{ padding: '8px 10px', borderRadius: '10px', border: '1px solid #e5e7eb', background: '#f7f8fc', cursor: 'pointer', color: RED, flexShrink: 0 }}>
               <IconPlus />
             </button>
           </div>
@@ -140,7 +142,7 @@ export default function CategoryPicker({ value, onChange }: Props) {
               {subs2.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
             <button type="button" onClick={() => { setAdding('l3'); setNewName('') }}
-              style={{ padding: '8px 10px', borderRadius: '10px', border: '1px solid #e5e7eb', background: '#f7f8fc', cursor: 'pointer', color: TEAL, flexShrink: 0 }}>
+              style={{ padding: '8px 10px', borderRadius: '10px', border: '1px solid #e5e7eb', background: '#f7f8fc', cursor: 'pointer', color: RED, flexShrink: 0 }}>
               <IconPlus />
             </button>
           </div>
@@ -169,9 +171,9 @@ function AddRow({ name, onChange, onSave, onCancel, saving }: {
       <input autoFocus value={name} onChange={e => onChange(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onSave() } if (e.key === 'Escape') onCancel() }}
         placeholder="New category name…"
-        style={{ flex: 1, padding: '7px 10px', borderRadius: '8px', border: '1px solid #00c49a', fontSize: '12px', outline: 'none' }} />
+        style={{ flex: 1, padding: '7px 10px', borderRadius: '8px', border: '1px solid #C8102E', fontSize: '12px', outline: 'none' }} />
       <button type="button" onClick={onSave} disabled={saving}
-        style={{ padding: '7px 14px', borderRadius: '8px', background: '#00c49a', color: '#fff', fontSize: '12px', fontWeight: 700, cursor: 'pointer', border: 'none' }}>
+        style={{ padding: '7px 14px', borderRadius: '8px', background: '#C8102E', color: '#fff', fontSize: '12px', fontWeight: 700, cursor: 'pointer', border: 'none' }}>
         {saving ? '…' : 'Add'}
       </button>
       <button type="button" onClick={onCancel}

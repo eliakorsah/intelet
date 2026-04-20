@@ -1,53 +1,52 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
-import Navbar from '@/components/Navbar'
-import BrandsTicker from '@/components/BrandsTicker'
-import Footer from '@/components/Footer'
+import { SiteHeader, SiteFooter } from '@/components/SiteChrome'
+import { COMPANY, COLORS } from '@/lib/brand'
 
-const BASE = 'https://www.tritechtechnologiesltd.com'
+const BASE = COMPANY.baseUrl
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
 
   title: {
-    default: 'Tritech Technologies Ltd | CCTV, Security & IT Solutions Ghana',
-    template: '%s | Tritech Technologies Ghana',
+    default: `${COMPANY.name} | Home Appliances Ghana — Grand Opening 24–27 April 2026`,
+    template: `%s | ${COMPANY.name} Ghana`,
   },
-  description: 'Ghana\'s trusted IT & security solutions provider since 2003. Authorized dealer for Hikvision, Dahua, TP-Link, D-Link & more. CCTV cameras, access control, networking, fire alarms — wholesale & retail with nationwide delivery.',
+  description: `${COMPANY.name} is Ghana's trusted home-appliance retailer — Samsung, Midea, Bruhm, Tamashi, TCL, NASCO and Haier fridges, freezers, washing machines, ACs and TVs. Grand Opening promo 24–27 April 2026 at Lapaz-Akweteyman, next to MTN on the N1 Highway.`,
   keywords: [
-    'CCTV cameras Ghana', 'Hikvision Ghana', 'Dahua Ghana', 'security cameras Accra',
-    'IT equipment Ghana', 'access control Ghana', 'networking equipment Accra',
-    'fire alarm Ghana', 'TP-Link Ghana', 'D-Link Ghana', 'Grandstream Ghana',
-    'security solutions Ghana', 'Tritech Technologies', 'tritechtechnologiesltd',
-    'surveillance cameras Ghana', 'NVR DVR Ghana', 'IP cameras Accra',
-    'authorized Hikvision dealer Ghana', 'IT distributor Ghana',
+    'home appliances Ghana', 'fridges Ghana', 'washing machines Accra',
+    'air conditioners Ghana', 'chest freezer Ghana', 'televisions Accra',
+    'Samsung Ghana', 'Midea Ghana', 'Bruhm Ghana', 'Tamashi Ghana',
+    'TCL Ghana', 'NASCO Ghana', 'Haier Ghana',
+    'Intelet Enterprise', 'Intelet Ghana', 'Lapaz Akweteyman appliances',
+    'Grand Opening appliances Ghana', 'appliance discounts Ghana',
   ],
 
-  authors: [{ name: 'Tritech Technologies Ghana Limited', url: BASE }],
-  creator: 'Tritech Technologies Ghana Limited',
-  publisher: 'Tritech Technologies Ghana Limited',
+  authors: [{ name: COMPANY.name, url: BASE }],
+  creator: COMPANY.name,
+  publisher: COMPANY.name,
 
   icons: {
-    icon: [{ url: '/fav.jpg', type: 'image/jpeg' }],
-    apple: '/fav.jpg',
-    shortcut: '/fav.jpg',
+    icon: [{ url: '/intelet-logo.png', type: 'image/png' }],
+    apple: '/intelet-logo.png',
+    shortcut: '/intelet-logo.png',
   },
 
   openGraph: {
     type: 'website',
     locale: 'en_GH',
     url: BASE,
-    siteName: 'Tritech Technologies Ghana Limited',
-    title: 'Tritech Technologies Ltd | CCTV, Security & IT Solutions Ghana',
-    description: 'Ghana\'s trusted IT & security solutions provider since 2003. Authorized dealer for Hikvision, Dahua, TP-Link & more. Nationwide delivery.',
-    images: [{ url: '/preview.jpg', width: 1200, height: 630, alt: 'Tritech Technologies Ghana - IT & Security Solutions' }],
+    siteName: COMPANY.name,
+    title: `${COMPANY.name} | Grand Opening 24–27 April 2026`,
+    description: `Ghana's home of quality appliances. Samsung, Midea, Bruhm, Tamashi, TCL, NASCO, Haier — with Grand Opening DISCOUNTS at Lapaz-Akweteyman.`,
+    images: [{ url: '/preview.jpg', width: 1200, height: 630, alt: `${COMPANY.name} — Grand Opening` }],
   },
 
   twitter: {
     card: 'summary_large_image',
-    title: 'Tritech Technologies Ltd | IT & Security Solutions Ghana',
-    description: 'Authorized dealer for Hikvision, Dahua, TP-Link & more. CCTV, access control, networking & IT equipment across Ghana.',
+    title: `${COMPANY.name} | Home Appliances Ghana`,
+    description: `Grand Opening DISCOUNTS 24–27 April 2026 — fridges, freezers, washers, ACs and TVs from the brands you trust.`,
     images: ['/preview.jpg'],
   },
 
@@ -59,8 +58,8 @@ export const metadata: Metadata = {
 
   alternates: { canonical: BASE },
 
-  category: 'technology',
-  classification: 'IT & Security Equipment',
+  category: 'retail',
+  classification: 'Home Appliances',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -69,53 +68,68 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link 
-          href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:ital,wght@0,100..900;1,100..900&family=Share+Tech+Mono&display=swap" 
-          rel="stylesheet" 
+        <link
+          href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:ital,wght@0,100..900;1,100..900&family=Share+Tech+Mono&display=swap"
+          rel="stylesheet"
         />
       </head>
-      <body className="bg-[#060d1a] text-slate-100 font-body antialiased">
+      <body className="bg-[#F5F4F2] text-[#1a1a1a] font-body antialiased">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify({
             '@context': 'https://schema.org',
-            '@type': 'LocalBusiness',
-            name: 'Tritech Technologies Ghana Limited',
-            url: 'https://www.tritechtechnologiesltd.com',
-            logo: 'https://www.tritechtechnologiesltd.com/logo.jpg',
-            image: 'https://www.tritechtechnologiesltd.com/preview.jpg',
-            description: 'Ghana\'s trusted IT & security solutions provider since 2003. Authorized dealer for Hikvision, Dahua, TP-Link, D-Link and more.',
-            telephone: ['+233555517658', '+233241050163'],
-            email: 'tritechtecnologies2023@gmail.com',
-            address: { '@type': 'PostalAddress', addressLocality: 'Accra', addressCountry: 'GH' },
+            '@type': 'HomeGoodsStore',
+            name: COMPANY.name,
+            url: BASE,
+            logo: `${BASE}/intelet-logo.png`,
+            image: `${BASE}/preview.jpg`,
+            description: `${COMPANY.name} — home appliances retailer in Ghana. Authorized dealer for Samsung, Midea, Bruhm, Tamashi, TCL, NASCO and Haier.`,
+            telephone: [COMPANY.phones.primary, COMPANY.phones.secondary],
+            email: COMPANY.email,
+            address: {
+              '@type': 'PostalAddress',
+              streetAddress: `${COMPANY.address.line1}, ${COMPANY.address.line2}`,
+              addressLocality: COMPANY.address.city,
+              addressCountry: 'GH',
+            },
             geo: { '@type': 'GeoCoordinates', latitude: 5.6037, longitude: -0.1870 },
             openingHoursSpecification: [
               { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday'], opens: '08:00', closes: '18:00' },
               { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Saturday'], opens: '09:00', closes: '16:00' },
             ],
-            sameAs: ['https://wa.me/233555517658'],
+            sameAs: [`https://wa.me/${COMPANY.whatsapp.number}`],
             priceRange: '₵₵',
             currenciesAccepted: 'GHS',
             paymentAccepted: 'Cash, Mobile Money',
             areaServed: { '@type': 'Country', name: 'Ghana' },
+            event: {
+              '@type': 'SaleEvent',
+              name: 'Intelet Grand Opening DISCOUNTS',
+              startDate: COMPANY.grandOpening.startDate,
+              endDate: COMPANY.grandOpening.endDate,
+              location: {
+                '@type': 'Place',
+                name: COMPANY.name,
+                address: COMPANY.address.full,
+              },
+            },
           })}}
         />
         <div className="" />
-        <Navbar />
-        <BrandsTicker />
+        <SiteHeader />
         <main className="animate-page-enter">{children}</main>
-        <Footer />
-        <Toaster 
+        <SiteFooter />
+        <Toaster
           position="top-right"
           toastOptions={{
             style: {
-              background: '#0a1628',
-              color: '#e2e8f0',
-              border: '1px solid rgba(0,212,170,0.3)',
+              background: COLORS.white,
+              color: COLORS.ink,
+              border: `1px solid ${COLORS.ashLine}`,
               fontFamily: "'Exo 2', sans-serif",
             },
-            success: { iconTheme: { primary: '#00d4aa', secondary: '#060d1a' } },
-            error: { iconTheme: { primary: '#ef4444', secondary: '#060d1a' } },
+            success: { iconTheme: { primary: COLORS.red, secondary: COLORS.white } },
+            error: { iconTheme: { primary: '#ef4444', secondary: COLORS.white } },
           }}
         />
       </body>

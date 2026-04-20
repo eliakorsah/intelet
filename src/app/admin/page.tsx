@@ -6,9 +6,15 @@ import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import { BRANDS, type Product } from '@/types'
 import StockTab from '@/components/StockTab'
+import SalesDashboard from '@/components/admin/SalesDashboard'
+import InvoiceForm from '@/components/admin/InvoiceForm'
+import InvoiceList from '@/components/admin/InvoiceList'
+import ProductWatches, { useUnreadAlertCount } from '@/components/admin/ProductWatches'
+import { useRole, useIdleSignOut } from '@/lib/sales'
+import { COMPANY, COLORS, APPLIANCE_CATEGORIES, PARTNER_BRANDS } from '@/lib/brand'
 
-const TEAL = '#00c49a'
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'tritech2024'
+const RED = COLORS.red
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'intelet2026'
 
 // ── Inline SVGs ──────────────────────────────────────────────
 const IconPackage = () => (<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>)
@@ -21,41 +27,25 @@ const IconX      = ({ size=14 }: { size?: number }) => (<svg width={size} height
 const IconPlus   = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>)
 const IconChev   = ({ open }: { open: boolean }) => (<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition:'transform 0.2s', transform: open?'rotate(180deg)':'none' }}><path d="m6 9 6 6 6-6"/></svg>)
 
-// ── Category tree definition (mirrors Navbar + DB) ───────────
+// ── Category tree: one row per partner brand with appliance subcategories,
+// plus a virtual "All Appliances" group for brand-agnostic taxonomy.
 type SubSub = { name: string; slug: string }
 type Sub    = { name: string; slug: string; subsubs?: SubSub[] }
 type Cat    = { name: string; slug: string; subs: Sub[] }
 
 const CATEGORY_TREE: Cat[] = [
   {
-    name: 'Hikvision', slug: 'hikvision',
-    subs: [
-      { name: 'NVR',        slug: 'hikvision-nvr' },
-      { name: 'EVR/EDVR',   slug: 'hikvision-evr' },
-      { name: 'DVR',        slug: 'hikvision-dvr', subsubs: [{ name:'2MP', slug:'hikvision-dvr-2mp' }, { name:'5MP', slug:'hikvision-dvr-5mp' }] },
-      { name: 'IP Cameras', slug: 'hikvision-ip' },
-    ],
+    name: 'All Appliances', slug: 'all-appliances',
+    subs: APPLIANCE_CATEGORIES.map(c => ({ name: c.name, slug: c.slug })),
   },
-  {
-    name: 'Dahua', slug: 'dahua',
-    subs: [
-      { name: 'NVR',        slug: 'dahua-nvr' },
-      { name: 'DVR',        slug: 'dahua-dvr', subsubs: [{ name:'4MP', slug:'dahua-dvr-4mp' }, { name:'8MP', slug:'dahua-dvr-8mp' }] },
-      { name: 'IP Cameras', slug: 'dahua-ip' },
-    ],
-  },
-  { name: 'Hi-Look',                 slug: 'hi-look',                 subs: [] },
-  { name: 'Grandstream',             slug: 'grandstream',             subs: [] },
-  { name: 'Alfama',                  slug: 'alfama',                  subs: [] },
-  { name: 'Addressable Fire Alarm',  slug: 'addressable-fire-alarm',  subs: [] },
-  { name: 'Conventional Fire Alarm', slug: 'conventional-fire-alarm', subs: [] },
-  { name: 'Solar 4G PTZ Cameras',   slug: 'solar-4g-ptz',            subs: [] },
-  { name: 'WiFi Cameras',           slug: 'wifi-cameras',            subs: [] },
-  { name: 'Analogue Cameras',       slug: 'analogue-cameras',        subs: [] },
-  { name: 'Networking Accessories', slug: 'networking-accessories',   subs: [] },
-  { name: 'CCTV Accessories',       slug: 'cctv-accessories',        subs: [] },
-  { name: 'Analogue Speakers',      slug: 'analogue-speakers',       subs: [] },
-  { name: 'IP Speakers',            slug: 'ip-speakers',             subs: [] },
+  ...PARTNER_BRANDS.map<Cat>(b => ({
+    name: b.name,
+    slug: b.slug,
+    subs: APPLIANCE_CATEGORIES.map(c => ({
+      name: c.name,
+      slug: `${b.slug}-${c.slug}`,
+    })),
+  })),
 ]
 
 // ── Inline Category Picker ───────────────────────────────────
@@ -99,7 +89,7 @@ function CategoryPicker({ value, onChange }: { value: string; onChange: (slug: s
 
   const sel = (active: boolean) => ({
     width: '100%', padding: '9px 12px', borderRadius: '10px', fontSize: '16px', outline: 'none', cursor: 'pointer',
-    border: `1px solid ${active ? TEAL : '#2a3a5c'}`, background: '#0d1f3c', color: '#e2e8f0',
+    border: `1px solid ${active ? RED : COLORS.ashLine}`, background: COLORS.white, color: COLORS.ink,
   } as React.CSSProperties)
 
   return (
@@ -124,7 +114,7 @@ function CategoryPicker({ value, onChange }: { value: string; onChange: (slug: s
       )}
 
       {l1 && (
-        <div style={{ fontSize:'11px', color:'#64748b', fontFamily:'monospace', padding:'4px 8px', background:'rgba(0,196,154,0.06)', borderRadius:'6px', border:'1px solid rgba(0,196,154,0.15)' }}>
+        <div style={{ fontSize:'11px', color:'#64748b', fontFamily:'monospace', padding:'4px 8px', background:'rgba(200,16,46,0.06)', borderRadius:'6px', border:'1px solid rgba(200,16,46,0.15)' }}>
           {[l1,l2,l3].filter(Boolean).map(slug => {
             for (const c of CATEGORY_TREE) {
               if (c.slug===slug) return c.name
@@ -151,9 +141,9 @@ function ImagePreview({ files, existing, onRemoveFile, onRemoveExisting, onReord
   return (
     <div style={{ display:'flex', flexWrap:'wrap', gap:'8px', marginTop:'10px' }}>
       {existing.map((url, i) => (
-        <div key={url} style={{ position:'relative', width:'72px', height:'72px', borderRadius:'10px', overflow:'hidden', border:'2px solid rgba(0,196,154,0.3)' }}>
+        <div key={url} style={{ position:'relative', width:'72px', height:'72px', borderRadius:'10px', overflow:'hidden', border:'2px solid rgba(200,16,46,0.3)' }}>
           <Image src={url} alt="" fill className="object-cover" sizes="72px" />
-          {i === 0 && <span style={{ position:'absolute', bottom:2, left:2, background:TEAL, color:'#fff', fontSize:'7px', fontWeight:800, padding:'1px 4px', borderRadius:'4px', letterSpacing:'0.1em' }}>COVER</span>}
+          {i === 0 && <span style={{ position:'absolute', bottom:2, left:2, background:RED, color:'#fff', fontSize:'7px', fontWeight:800, padding:'1px 4px', borderRadius:'4px', letterSpacing:'0.1em' }}>COVER</span>}
           <button type="button" onClick={() => onRemoveExisting(i)}
             style={{ position:'absolute', top:2, right:2, background:'rgba(0,0,0,0.6)', border:'none', borderRadius:'50%', width:'18px', height:'18px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff' }}>
             <IconX size={10} />
@@ -172,7 +162,7 @@ function ImagePreview({ files, existing, onRemoveFile, onRemoveExisting, onReord
             onReorderFiles(arr)
             dragIdx.current = null
           }}
-          style={{ position:'relative', width:'72px', height:'72px', borderRadius:'10px', overflow:'hidden', border:'1px solid #2a3a5c', cursor:'grab' }}>
+          style={{ position:'relative', width:'72px', height:'72px', borderRadius:'10px', overflow:'hidden', border:`1px solid ${COLORS.ashLine}`, cursor:'grab' }}>
           <Image src={URL.createObjectURL(f)} alt="" fill className="object-cover" sizes="72px" />
           <button type="button" onClick={() => onRemoveFile(i)}
             style={{ position:'absolute', top:2, right:2, background:'rgba(0,0,0,0.6)', border:'none', borderRadius:'50%', width:'18px', height:'18px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff' }}>
@@ -192,7 +182,7 @@ function useToast() {
     setTimeout(() => setMsg(null), 3000)
   }, [])
   const Toast = msg ? (
-    <div style={{ position:'fixed', bottom:'24px', right:'24px', zIndex:9999, padding:'12px 20px', borderRadius:'12px', background: msg.type==='ok'?TEAL:'#ef4444', color:'#fff', fontWeight:700, fontSize:'13px', boxShadow:'0 8px 24px rgba(0,0,0,0.3)' }}>
+    <div style={{ position:'fixed', bottom:'24px', right:'24px', zIndex:9999, padding:'12px 20px', borderRadius:'12px', background: msg.type==='ok'?RED:'#ef4444', color:'#fff', fontWeight:700, fontSize:'13px', boxShadow:'0 8px 24px rgba(0,0,0,0.3)' }}>
       {msg.text}
     </div>
   ) : null
@@ -203,10 +193,12 @@ function useToast() {
 export default function AdminPage() {
   const { show, Toast } = useToast()
   const [authed,      setAuthed]      = useState(false)
+  const [email,       setEmail]       = useState('')
   const [password,    setPassword]    = useState('')
-  // ── ADDED: dark mode state ──
-  const [darkMode,    setDarkMode]    = useState(true)
-  const [tab,         setTab]         = useState<'products'|'orders'|'add'|'stock'>('products')
+  const [signingIn,   setSigningIn]   = useState(false)
+  // Default to light (Intelet ash/white) — user can still toggle dark.
+  const [darkMode,    setDarkMode]    = useState(false)
+  const [tab,         setTab]         = useState<'products'|'orders'|'add'|'stock'|'sales'|'invoice'|'invoices'|'alerts'>('products')
   const [products,    setProducts]    = useState<Product[]>([])
   const [orders,      setOrders]      = useState<any[]>([])
   const [loading,     setLoading]     = useState(false)
@@ -225,19 +217,17 @@ export default function AdminPage() {
   const [dragging,   setDragging]   = useState(false)
 
   const router = useRouter()
+  const { role, isBoss } = useRole()
+  useIdleSignOut(30)
+  const unreadAlerts = useUnreadAlertCount(authed && isBoss)
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data } = await supabase.auth.getSession()
-      if (data?.session) setAuthed(true)
+    setAuthed(typeof window !== 'undefined' && localStorage.getItem('intelet-admin') === '1')
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'intelet-admin') setAuthed(e.newValue === '1')
     }
-
-    checkAuth()
-    const { data: listener } = supabase.auth.onAuthStateChange((_, session) => {
-      setAuthed(!!session)
-    })
-
-    return () => listener.subscription.unsubscribe()
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
   }, [])
 
   useEffect(() => {
@@ -262,8 +252,17 @@ export default function AdminPage() {
     for (const file of imageFiles) {
       const ext  = file.name.split('.').pop()
       const name = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-      const { data, error } = await supabase.storage.from('product-images').upload(name, file, { cacheControl:'31536000', upsert:false })
-      if (error) { show(`Upload failed: ${error.message}`, 'err'); continue }
+      const uploadPromise = supabase.storage.from('product-images')
+        .upload(name, file, { cacheControl: '31536000', upsert: false })
+      const timeout = new Promise<{ data: null; error: Error }>(resolve =>
+        setTimeout(() => resolve({ data: null, error: new Error('Upload timed out after 60s — check bucket exists and RLS allows authenticated uploads') }), 60_000)
+      )
+      const { data, error } = await Promise.race([uploadPromise, timeout]) as any
+      if (error) {
+        console.error('[uploadImages] failed for', file.name, error)
+        show(`Upload failed (${file.name}): ${error.message}`, 'err')
+        continue
+      }
       if (data) {
         const { data: u } = supabase.storage.from('product-images').getPublicUrl(data.path)
         urls.push(u.publicUrl)
@@ -341,20 +340,22 @@ export default function AdminPage() {
 
   const inputStyle: React.CSSProperties = {
     width:'100%', padding:'10px 14px', borderRadius:'10px', fontSize:'16px', outline:'none',
-    border:'1px solid #2a3a5c', background:'#0d1f3c', color:'#e2e8f0',
+    border: `1px solid ${darkMode ? '#2a2f3e' : COLORS.ashLine}`,
+    background: darkMode ? '#14192a' : COLORS.white,
+    color: darkMode ? '#e2e8f0' : COLORS.ink,
   }
   const labelStyle: React.CSSProperties = {
-    fontSize:'10px', fontWeight:800, color:TEAL, letterSpacing:'0.2em', textTransform:'uppercase', display:'block', marginBottom:'5px',
+    fontSize:'10px', fontWeight:800, color:RED, letterSpacing:'0.2em', textTransform:'uppercase', display:'block', marginBottom:'5px',
   }
 
   // ── ADDED: dark/light theme tokens ──────────────────────────
   const theme = {
-    pageBg:  darkMode ? '#060d1a'              : '#f0f4f8',
-    cardBg:  darkMode ? 'rgba(13,31,60,0.8)'   : '#ffffff',
-    border:  darkMode ? 'rgba(0,196,154,0.12)' : 'rgba(0,180,140,0.2)',
-    text:    darkMode ? '#e2e8f0'              : '#1a2535',
-    sub:     darkMode ? '#64748b'              : '#64748b',
-    muted:   darkMode ? '#475569'              : '#94a3b8',
+    pageBg:  darkMode ? '#0a0f1a'              : COLORS.ash,
+    cardBg:  darkMode ? 'rgba(20,26,40,0.85)'  : COLORS.white,
+    border:  darkMode ? 'rgba(200,16,46,0.18)' : COLORS.ashLine,
+    text:    darkMode ? '#e2e8f0'              : COLORS.ink,
+    sub:     darkMode ? '#94a3b8'              : COLORS.inkSoft,
+    muted:   darkMode ? '#64748b'              : COLORS.inkMuted,
   }
 
   // ── Login screen ─────────────────────────────────────────
@@ -389,21 +390,27 @@ export default function AdminPage() {
 
       <div style={{ width:'100%', maxWidth:'420px' }}>
         <div style={{ textAlign:'center', marginBottom:'32px' }}>
-          <div style={{ width:'64px', height:'64px', borderRadius:'16px', background:'rgba(0,196,154,0.1)', border:'1px solid rgba(0,196,154,0.2)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px', color:TEAL }}>
+          <div style={{ width:'64px', height:'64px', borderRadius:'16px', background:'rgba(200,16,46,0.1)', border:'1px solid rgba(200,16,46,0.2)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px', color:RED }}>
             <IconPackage />
           </div>
           <h1 style={{ color: theme.text, fontWeight:900, fontSize:'28px', letterSpacing:'0.05em', transition:'color 0.35s' }}>MANAGER PORTAL</h1>
-          <p style={{ color:'#64748b', fontSize:'13px', marginTop:'6px', fontFamily:'monospace' }}>Tritech Technologies Admin</p>
+          <p style={{ color:'#64748b', fontSize:'13px', marginTop:'6px', fontFamily:'monospace' }}>Intelet Enterprise Admin</p>
         </div>
         <form
-          onSubmit={e => { e.preventDefault(); if (password===ADMIN_PASSWORD) { setAuthed(true) } else show('Wrong password','err') }}
+          onSubmit={e => {
+            e.preventDefault()
+            if (!password) return show('Access key required', 'err')
+            if (password !== ADMIN_PASSWORD) { show('Invalid access key', 'err'); return }
+            localStorage.setItem('intelet-admin', '1')
+            setAuthed(true); setPassword('')
+          }}
           style={{ background: darkMode ? 'rgba(10,22,40,0.9)' : '#ffffff', border:`1px solid ${theme.border}`, borderRadius:'16px', padding:'32px', transition:'all 0.35s ease' }}
         >
-          <label style={labelStyle}>Access Code</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password"
+          <label style={labelStyle}>Access Key</label>
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" autoComplete="current-password" autoFocus
             style={{ ...inputStyle, marginBottom:'20px' }} />
-          <button type="submit" style={{ width:'100%', padding:'12px', borderRadius:'10px', background:TEAL, color:'#fff', fontWeight:900, fontSize:'14px', border:'none', cursor:'pointer', letterSpacing:'0.1em' }}>
-            ACCESS PORTAL
+          <button type="submit" style={{ width:'100%', padding:'12px', borderRadius:'10px', background: RED, color:'#fff', fontWeight:900, fontSize:'14px', border:'none', cursor:'pointer', letterSpacing:'0.1em' }}>
+            UNLOCK
           </button>
         </form>
       </div>
@@ -425,7 +432,7 @@ export default function AdminPage() {
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'32px', flexWrap:'wrap', gap:'12px' }}>
           <div>
             <h1 style={{ color: theme.text, fontWeight:900, fontSize:'28px', letterSpacing:'0.05em', transition:'color 0.35s' }}>MANAGER PORTAL</h1>
-            <p style={{ color:'#64748b', fontSize:'12px', fontFamily:'monospace', marginTop:'4px' }}>Tritech Technologies Admin</p>
+            <p style={{ color:'#64748b', fontSize:'12px', fontFamily:'monospace', marginTop:'4px' }}>Intelet Enterprise Admin</p>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
             {/* ── ADDED: dark/light toggle in dashboard header ── */}
@@ -447,7 +454,25 @@ export default function AdminPage() {
               {darkMode ? 'Dark' : 'Light'}
             </button>
 
-            <button onClick={() => { supabase.auth.signOut(); setAuthed(false); router.push('/admin/login') }}
+            {isBoss && (
+              <button onClick={() => setTab('alerts')} title="Boss alerts"
+                style={{ position:'relative', background:'none', border:`1px solid ${theme.border}`, borderRadius:'10px', padding:'8px 12px', cursor:'pointer', color: theme.text, fontSize:'16px' }}>
+                🔔
+                {unreadAlerts > 0 && (
+                  <span style={{ position:'absolute', top:-6, right:-6, background:'#ef4444', color:'#fff', fontSize:10, fontWeight:900, padding:'2px 6px', borderRadius:10, minWidth:18, textAlign:'center' }}>
+                    {unreadAlerts > 99 ? '99+' : unreadAlerts}
+                  </span>
+                )}
+              </button>
+            )}
+
+            {role && (
+              <span style={{ fontSize:11, fontWeight:800, letterSpacing:'0.12em', padding:'6px 10px', borderRadius:8, background:'rgba(200,16,46,0.1)', color:RED }}>
+                {role.toUpperCase()}
+              </span>
+            )}
+
+            <button onClick={() => { localStorage.removeItem('intelet-admin'); setAuthed(false); router.push('/admin/login') }}
               style={{ color:'#64748b', fontSize:'13px', background:'none', border:'none', cursor:'pointer' }}>
               Sign Out
             </button>
@@ -468,7 +493,7 @@ export default function AdminPage() {
               background: theme.cardBg,
               transition:'all 0.35s ease',
             }}>
-              <div style={{ color:TEAL, marginBottom:'10px' }}>{s.icon}</div>
+              <div style={{ color:RED, marginBottom:'10px' }}>{s.icon}</div>
               <div style={{ color: theme.text, fontWeight:900, fontSize:'28px', lineHeight:1, transition:'color 0.35s' }}>{s.value}</div>
               <div style={{ color:'#64748b', fontSize:'11px', fontFamily:'monospace', marginTop:'4px' }}>{s.label}</div>
             </div>
@@ -483,12 +508,30 @@ export default function AdminPage() {
           borderRadius:'12px', padding:'4px', width:'fit-content', maxWidth:'100%', overflowX:'auto', marginBottom:'28px',
           transition:'all 0.35s ease',
         }}>
-          {(['products','orders','add','stock'] as const).map(t => (
-            <button key={t} onClick={() => { setTab(t); if (t!=='add') { resetForm(); setEditProduct(null) } }}
-              style={{ padding:'10px 20px', borderRadius:'8px', fontWeight:700, fontSize:'12px', letterSpacing:'0.1em', border:'none', cursor:'pointer', transition:'all 0.15s', background: tab===t ? TEAL : 'transparent', color: tab===t ? '#060d1a' : '#64748b' }}>
-              {t==='add' ? (editProduct ? 'EDIT PRODUCT' : '+ ADD PRODUCT') : t==='stock' ? '📦 STOCK' : t.toUpperCase()}
-            </button>
-          ))}
+          {(() => {
+            const all = ['sales','invoice','invoices','alerts','products','orders','add','stock'] as const
+            const visible = all.filter(t => {
+              // Cashier can only: create invoices + see their own invoice list
+              if (!isBoss && role === 'cashier') return t === 'invoice' || t === 'invoices'
+              // If role not loaded yet, show the old admin surface (fallback to password-based)
+              return true
+            })
+            const labelOf = (t: typeof all[number]) => {
+              if (t === 'add')      return editProduct ? 'EDIT PRODUCT' : '+ ADD PRODUCT'
+              if (t === 'stock')    return '📦 STOCK'
+              if (t === 'sales')    return '📊 SALES'
+              if (t === 'invoice')  return '+ NEW INVOICE'
+              if (t === 'invoices') return 'INVOICES'
+              if (t === 'alerts')   return `🔔 ALERTS${unreadAlerts ? ` (${unreadAlerts})` : ''}`
+              return t.toUpperCase()
+            }
+            return visible.map(t => (
+              <button key={t} onClick={() => { setTab(t); if (t!=='add') { resetForm(); setEditProduct(null) } }}
+                style={{ padding:'10px 20px', borderRadius:'8px', fontWeight:700, fontSize:'12px', letterSpacing:'0.1em', border:'none', cursor:'pointer', transition:'all 0.15s', background: tab===t ? RED : 'transparent', color: tab===t ? '#ffffff' : '#64748b', position:'relative' }}>
+                {labelOf(t)}
+              </button>
+            ))
+          })()}
         </div>
 
         {/* Products tab */}
@@ -499,14 +542,14 @@ export default function AdminPage() {
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:'12px' }}>
               {filteredProducts.map(p => (
                 <div key={p.id} style={{ display:'flex', gap:'14px', padding:'16px', borderRadius:'14px', border:`1px solid ${theme.border}`, background: theme.cardBg, transition:'all 0.35s ease' }}>
-                  <div style={{ position:'relative', width:'76px', height:'76px', borderRadius:'10px', overflow:'hidden', background:'#0d1f3c', flexShrink:0 }}>
+                  <div style={{ position:'relative', width:'76px', height:'76px', borderRadius:'10px', overflow:'hidden', background: darkMode ? '#14192a' : COLORS.ash, flexShrink:0 }}>
                     {p.images?.[0] ? <Image src={p.images[0]} alt={p.title} fill className="object-cover" sizes="76px" /> : <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', color:'#334155' }}><IconPackage /></div>}
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ fontSize:'10px', color:'#475569', fontFamily:'monospace', marginBottom:'3px' }}>{p.brand} · {p.model_number}</div>
                     <div style={{ fontWeight:700, color: theme.text, fontSize:'13px', marginBottom:'8px', overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>{p.title}</div>
                     <div style={{ display:'flex', alignItems:'center', gap:'8px', flexWrap:'wrap' }}>
-                      <span style={{ fontSize:'11px', padding:'2px 8px', borderRadius:'6px', background: p.in_stock?'rgba(0,196,154,0.12)':'rgba(239,68,68,0.1)', color: p.in_stock?TEAL:'#f87171' }}>
+                      <span style={{ fontSize:'11px', padding:'2px 8px', borderRadius:'6px', background: p.in_stock?'rgba(200,16,46,0.12)':'rgba(239,68,68,0.1)', color: p.in_stock?RED:'#f87171' }}>
                         {p.in_stock ? 'In Stock' : 'Out of Stock'}
                       </span>
                       <div style={{ marginLeft:'auto', display:'flex', gap:'4px' }}>
@@ -537,7 +580,7 @@ export default function AdminPage() {
                   </div>
                   <div style={{ textAlign:'right' }}>
                     <div style={{ color:'#475569', fontSize:'11px', fontFamily:'monospace' }}>{new Date(order.created_at).toLocaleDateString()}</div>
-                    <div style={{ color:TEAL, fontFamily:'monospace', fontSize:'12px' }}>Qty: {order.quantity}</div>
+                    <div style={{ color:RED, fontFamily:'monospace', fontSize:'12px' }}>Qty: {order.quantity}</div>
                   </div>
                 </div>
                 <div style={{ color:'#94a3b8', fontSize:'13px', marginBottom:'12px' }}>
@@ -547,9 +590,9 @@ export default function AdminPage() {
                   {(['pending','confirmed','delivered','cancelled'] as const).map(status => (
                     <button key={status} onClick={async () => { await supabase.from('orders').update({ status }).eq('id',order.id); fetchOrders(); show(`Marked ${status}`) }}
                       style={{ padding:'6px 14px', borderRadius:'8px', fontSize:'11px', fontWeight:700, letterSpacing:'0.08em', border:'none', cursor:'pointer', transition:'all 0.15s',
-                        background: order.status===status ? TEAL : 'rgba(0,196,154,0.08)',
-                        color: order.status===status ? '#060d1a' : '#64748b',
-                        outline: order.status===status ? 'none' : '1px solid rgba(0,196,154,0.2)',
+                        background: order.status===status ? RED : 'rgba(200,16,46,0.08)',
+                        color: order.status===status ? '#ffffff' : '#64748b',
+                        outline: order.status===status ? 'none' : '1px solid rgba(200,16,46,0.2)',
                       }}>
                       {status.toUpperCase()}
                     </button>
@@ -567,13 +610,13 @@ export default function AdminPage() {
 
               <div>
                 <label style={labelStyle}>Product Title *</label>
-                <input required value={form.title} onChange={e => setForm(p=>({...p,title:e.target.value}))} placeholder="e.g. Hikvision 4MP ColorVu Fixed Bullet Camera" style={inputStyle} />
+                <input required value={form.title} onChange={e => setForm(p=>({...p,title:e.target.value}))} placeholder="e.g. Bruhm 508L Chest Freezer" style={inputStyle} />
               </div>
 
               <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:'14px' }}>
                 <div>
                   <label style={labelStyle}>Model Number *</label>
-                  <input required value={form.model_number} onChange={e => setForm(p=>({...p,model_number:e.target.value}))} placeholder="e.g. DS-2CD2T47G2-L" style={inputStyle} />
+                  <input required value={form.model_number} onChange={e => setForm(p=>({...p,model_number:e.target.value}))} placeholder="e.g. BCF-508" style={inputStyle} />
                 </div>
                 <div>
                   <label style={labelStyle}>Brand *</label>
@@ -601,15 +644,15 @@ export default function AdminPage() {
               <div>
                 <label style={labelStyle}>Specifications</label>
                 <div style={{ display:'flex', gap:'8px', marginBottom:'10px', flexWrap:'wrap' }}>
-                  <input value={specKey} onChange={e => setSpecKey(e.target.value)} onKeyDown={e => { if(e.key==='Enter'){e.preventDefault();addSpec()} }} placeholder="Key (e.g. Resolution)" style={{ ...inputStyle, flex:'1 1 140px' }} />
-                  <input value={specVal} onChange={e => setSpecVal(e.target.value)} onKeyDown={e => { if(e.key==='Enter'){e.preventDefault();addSpec()} }} placeholder="Value (e.g. 4MP)" style={{ ...inputStyle, flex:'1 1 140px' }} />
-                  <button type="button" onClick={addSpec} style={{ padding:'10px 16px', borderRadius:'10px', background:TEAL, color:'#fff', fontWeight:700, border:'none', cursor:'pointer', flexShrink:0 }}>
+                  <input value={specKey} onChange={e => setSpecKey(e.target.value)} onKeyDown={e => { if(e.key==='Enter'){e.preventDefault();addSpec()} }} placeholder="Key (e.g. Capacity)" style={{ ...inputStyle, flex:'1 1 140px' }} />
+                  <input value={specVal} onChange={e => setSpecVal(e.target.value)} onKeyDown={e => { if(e.key==='Enter'){e.preventDefault();addSpec()} }} placeholder="Value (e.g. 508L)" style={{ ...inputStyle, flex:'1 1 140px' }} />
+                  <button type="button" onClick={addSpec} style={{ padding:'10px 16px', borderRadius:'10px', background:RED, color:'#fff', fontWeight:700, border:'none', cursor:'pointer', flexShrink:0 }}>
                     <IconPlus />
                   </button>
                 </div>
                 {Object.entries(form.specifications).map(([k,v]) => (
-                  <div key={k} style={{ display:'flex', alignItems:'center', padding:'8px 12px', borderRadius:'8px', background:'rgba(0,196,154,0.06)', border:'1px solid rgba(0,196,154,0.15)', marginBottom:'6px' }}>
-                    <span style={{ color:TEAL, fontFamily:'monospace', fontSize:'12px', marginRight:'8px' }}>{k}:</span>
+                  <div key={k} style={{ display:'flex', alignItems:'center', padding:'8px 12px', borderRadius:'8px', background:'rgba(200,16,46,0.06)', border:'1px solid rgba(200,16,46,0.15)', marginBottom:'6px' }}>
+                    <span style={{ color:RED, fontFamily:'monospace', fontSize:'12px', marginRight:'8px' }}>{k}:</span>
                     <span style={{ color:'#94a3b8', fontSize:'12px', flex:1 }}>{v}</span>
                     <button type="button" onClick={() => setForm(p=>{const s={...p.specifications};delete s[k];return{...p,specifications:s}})}
                       style={{ background:'none', border:'none', cursor:'pointer', color:'#475569', padding:'2px' }}><IconX /></button>
@@ -624,7 +667,7 @@ export default function AdminPage() {
                   onDragLeave={() => setDragging(false)}
                   onDragOver={e => e.preventDefault()}
                   onDrop={handleDrop}
-                  style={{ border:`2px dashed ${dragging?TEAL:'rgba(0,196,154,0.25)'}`, borderRadius:'14px', padding:'32px', textAlign:'center', cursor:'pointer', transition:'border-color 0.2s', background: dragging?'rgba(0,196,154,0.05)':'transparent' }}
+                  style={{ border:`2px dashed ${dragging?RED:'rgba(200,16,46,0.25)'}`, borderRadius:'14px', padding:'32px', textAlign:'center', cursor:'pointer', transition:'border-color 0.2s', background: dragging?'rgba(200,16,46,0.05)':'transparent' }}
                   onClick={() => document.getElementById('img-upload')?.click()}>
                   <div style={{ color:'#334155', marginBottom:'8px', display:'flex', justifyContent:'center' }}><IconUpload /></div>
                   <p style={{ color:'#64748b', fontSize:'13px', marginBottom:'4px' }}>Drop images here or click to browse</p>
@@ -641,11 +684,11 @@ export default function AdminPage() {
 
               <div style={{ display:'flex', gap:'24px' }}>
                 {[
-                  { label:'In Stock',  key:'in_stock' as const,  color:TEAL },
+                  { label:'In Stock',  key:'in_stock' as const,  color:RED },
                   { label:'Featured',  key:'featured' as const,  color:'#fbbf24' },
                 ].map(({ label, key, color }) => (
                   <div key={key} style={{ display:'flex', alignItems:'center', gap:'10px', cursor:'pointer' }} onClick={() => setForm(p=>({...p,[key]:!p[key]}))}>
-                    <div style={{ width:'44px', height:'24px', borderRadius:'12px', background: form[key]?color:'#1e293b', position:'relative', transition:'background 0.2s' }}>
+                    <div style={{ width:'44px', height:'24px', borderRadius:'12px', background: form[key] ? color : (darkMode ? '#1e293b' : COLORS.ashDeep), position:'relative', transition:'background 0.2s' }}>
                       <div style={{ position:'absolute', top:'4px', width:'16px', height:'16px', borderRadius:'50%', background:'#fff', boxShadow:'0 1px 3px rgba(0,0,0,0.3)', transition:'transform 0.2s', transform: form[key]?'translateX(24px)':'translateX(4px)' }} />
                     </div>
                     <span style={{ color:'#94a3b8', fontSize:'12px', fontWeight:700, letterSpacing:'0.08em' }}>{label.toUpperCase()}</span>
@@ -655,18 +698,42 @@ export default function AdminPage() {
 
               <div style={{ display:'flex', gap:'12px', paddingTop:'8px' }}>
                 <button type="submit" disabled={loading}
-                  style={{ flex:1, padding:'14px', borderRadius:'12px', background: loading?'#1e293b':TEAL, color: loading?'#475569':'#fff', fontWeight:900, fontSize:'14px', letterSpacing:'0.1em', border:'none', cursor: loading?'not-allowed':'pointer', transition:'all 0.2s' }}>
+                  style={{ flex:1, padding:'14px', borderRadius:'12px', background: loading ? COLORS.ashDeep : RED, color: loading ? COLORS.inkMuted : '#fff', fontWeight:900, fontSize:'14px', letterSpacing:'0.1em', border:'none', cursor: loading?'not-allowed':'pointer', transition:'all 0.2s' }}>
                   {loading ? 'SAVING…' : (editProduct ? 'UPDATE PRODUCT' : 'ADD PRODUCT')}
                 </button>
                 {editProduct && (
                   <button type="button" onClick={() => { resetForm(); setEditProduct(null); setTab('products') }}
-                    style={{ padding:'14px 24px', borderRadius:'12px', background:'#1e293b', color:'#94a3b8', fontWeight:700, border:'1px solid #2a3a5c', cursor:'pointer' }}>
+                    style={{ padding:'14px 24px', borderRadius:'12px', background: COLORS.ashDeep, color: COLORS.inkSoft, fontWeight:700, border:`1px solid ${COLORS.ashLine}`, cursor:'pointer' }}>
                     CANCEL
                   </button>
                 )}
               </div>
             </div>
           </form>
+        )}
+
+        {/* Sales dashboard (boss/admin only) */}
+        {tab === 'sales' && (
+          isBoss
+            ? <SalesDashboard isBoss={isBoss} />
+            : <div style={{ padding:48, textAlign:'center', color:'#64748b' }}>Boss/Admin role required.</div>
+        )}
+
+        {/* New invoice (all authenticated users) */}
+        {tab === 'invoice' && (
+          <InvoiceForm onSaved={() => show('Invoice saved and downloaded')} />
+        )}
+
+        {/* Invoice list */}
+        {tab === 'invoices' && (
+          <InvoiceList />
+        )}
+
+        {/* Product watch alerts (boss/admin only) */}
+        {tab === 'alerts' && (
+          isBoss
+            ? <ProductWatches />
+            : <div style={{ padding:48, textAlign:'center', color:'#64748b' }}>Boss/Admin role required.</div>
         )}
 
         {/* Stock tab */}

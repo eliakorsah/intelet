@@ -1,55 +1,42 @@
-export const BRANDS = [
-  { name: 'Hikvision', slug: 'hikvision', logo: '/images/brands/hikvision.png', color: '#e31837' },
-  { name: 'Dahua', slug: 'dahua', logo: '/images/brands/dahua.png', color: '#0066cc' },
-  { name: 'TP-Link', slug: 'tp-link', logo: '/images/brands/tplink.png', color: '#4fcb2a' },
-  { name: 'Tenda', slug: 'tenda', logo: '/images/brands/tenda.png', color: '#00a0e9' },
-  { name: 'JDVISION', slug: 'jdvision', logo: '/images/brands/jdvision.png', color: '#14b8aa' },
-  { name: 'CISCO', slug: 'cisco', logo: '/images/brands/cisco.png', color: '#1ba0d7' },
-  { name: 'D-Link', slug: 'd-link', logo: '/images/brands/dlink.png', color: '#0033a0' },
-  { name: 'Panasonic', slug: 'panasonic', logo: '/images/brands/panasonic.png', color: '#004b91' },
-] as const
+import { PARTNER_BRANDS, APPLIANCE_CATEGORIES, COMPANY } from '@/lib/brand'
 
-export type BrandName = typeof BRANDS[number]['name']
+// Re-export shape compatible with legacy imports so search/ProductCard/
+// ProductFilters keep working after the Intelet rebrand.
+export const BRANDS = PARTNER_BRANDS.map(b => ({
+  name:  b.name,
+  slug:  b.slug,
+  logo:  b.logo,
+  color: b.accent || '#C8102E',
+})) as readonly { name: string; slug: string; logo: string; color: string }[]
 
-export const CATEGORIES = [
-  'IP Cameras',
-  'Analog Cameras',
-  'Network Video Recorders (NVR)',
-  'Digital Video Recorders (DVR)',
-  'Network Switches',
-  'Routers & Access Points',
-  'Access Control',
-  'Boom Barriers & Turnstiles',
-  'Fire Alarm Systems',
-  'PA Systems & Speakers',
-  'Cables & Accessories',
-  'Hard Drives & Storage',
-  'Rack Cabinets',
-  'Hotel Door Locks',
-  'Other',
-] as const
+export type BrandName = typeof PARTNER_BRANDS[number]['name']
+
+export const CATEGORIES = APPLIANCE_CATEGORIES.map(c => c.name) as readonly string[]
 
 export const COMPANY_INFO = {
-  name: 'Tritech Technologies Limited',
-  tagline: 'Your One-Stop IT & Security Solutions Partner',
-  description: 'Welcome to Tritech Technologies Ghana Limited, your one-stop-shop for all your information Technology needs. We have been in the industry for over 20 years, providing quality IT equipment and accessories at affordable prices.',
-  phone: ['+233 55 551 7658', '+233 24 105 0163'],
-  email: 'tritechtecnologies2023@gmail.com',
+  name: COMPANY.name,
+  tagline: COMPANY.tagline,
+  description:
+    `${COMPANY.name} is Ghana's home of quality appliances. We stock refrigerators, ` +
+    `freezers, washing machines, air conditioners, televisions and small appliances ` +
+    `from trusted brands — backed by a 12-month manufacturer warranty.`,
+  phone: [COMPANY.phones.primaryFmt, COMPANY.phones.secondaryFmt],
+  email: COMPANY.email,
   social: {
-    instagram: 'tritechtechnologiesltd',
+    instagram: 'inteletenterprise',
   },
-  address: 'Accra, Ghana',
+  address: COMPANY.address.full,
   industries: [
-    'Commercial', 'Educational', 'Healthcare',
-    'Hospitality', 'Residential', 'Government',
+    'Home', 'Hospitality', 'Offices',
+    'Restaurants', 'Retail', 'Institutions',
   ],
 }
 
 export const NAV_LINKS = [
-  { label: 'Home', href: '/' },
+  { label: 'Home',     href: '/' },
   { label: 'Products', href: '/products' },
-  { label: 'Brands', href: '/brands' },
-  { label: 'Solutions', href: '/#solutions' },
-  { label: 'About', href: '/#about' },
-  { label: 'Contact', href: '/#contact' },
+  { label: 'Brands',   href: '/#brands' },
+  { label: 'Promo',    href: '/#grand-opening' },
+  { label: 'About',    href: '/about' },
+  { label: 'Contact',  href: '/contact' },
 ]

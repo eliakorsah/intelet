@@ -1,35 +1,32 @@
-export type Brand = 
-  | 'Hikvision' 
-  | 'Dahua' 
-  | 'TP-Link' 
-  | 'D-Link' 
-  | 'Panasonic'
-  | 'Hi-Look'
-  | 'Grandstream'
-  | 'Alfama'
-  | 'Addressable Fire Alarm'
-  | 'Conventional Fire Alarm'
-  | 'Solar 4G PTZ Cameras'
-  | 'WiFi Cameras'
-  | 'Analogue Cameras'
-  | 'Networking Accessories'
-  | 'CCTV Accessories'
-  | 'Analogue Speakers'
-  | 'IP Speakers'
+export type Brand =
+  | 'Samsung'
+  | 'Midea'
+  | 'Bruhm'
+  | 'Tamashi'
+  | 'TCL'
+  | 'NASCO'
+  | 'Haier'
+  | 'Refrigerators'
+  | 'Chest Freezers'
+  | 'Washing Machines'
+  | 'Air Conditioners'
+  | 'Televisions'
+  | 'Small Appliances'
 
 export const BRANDS: Brand[] = [
-  'Hikvision', 'Dahua', 'TP-Link', 'D-Link', 'Panasonic', 'Hi-Look',
-'Grandstream',
-'Alfama',
-'Addressable Fire Alarm',
-'Conventional Fire Alarm',
-'Solar 4G PTZ Cameras',
-'WiFi Cameras',
-'Analogue Cameras',
-'Networking Accessories',
-'CCTV Accessories',
-'Analogue Speakers',
-'IP Speakers',
+  'Samsung',
+  'Midea',
+  'Bruhm',
+  'Tamashi',
+  'TCL',
+  'NASCO',
+  'Haier',
+  'Refrigerators',
+  'Chest Freezers',
+  'Washing Machines',
+  'Air Conditioners',
+  'Televisions',
+  'Small Appliances',
 ]
 
 export interface Product {

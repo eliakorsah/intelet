@@ -5,8 +5,9 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
+import { COMPANY, COLORS, PARTNER_BRANDS, APPLIANCE_CATEGORIES, whatsappLink } from '@/lib/brand'
 
-const TEAL = '#00c49a'
+const RED = COLORS.red
 
 // ── Icons ────────────────────────────────────────────────────
 const IconSearch = () => (
@@ -53,51 +54,27 @@ const IconWhatsApp = () => (
 )
 
 // ── Category tree ────────────────────────────────────────────
-// icon: path to logo in /public. null = placeholder until you add the image
-// To add a logo: put the file in /public/ and set icon: '/filename.png'
-type SubSub = { name: string; slug: string }
-type Sub    = { name: string; slug: string; subsubs?: SubSub[] }
-type Cat    = { name: string; slug: string; icon: string | null; subs: Sub[] }
+type Sub = { name: string; slug: string }
+type Cat = { name: string; slug: string; icon: string | null; subs: Sub[] }
 
 const CATEGORIES: Cat[] = [
-  // ── Brand-based categories ──
-  { name: 'Hikvision',  slug: 'hikvision',  icon: '/hik.png',
+  // Partner brands first
+  ...PARTNER_BRANDS.map<Cat>(b => ({
+    name: b.name, slug: b.slug, icon: b.logo,
     subs: [
-      { name: 'NVR',               slug: 'hikvision-nvr' },
-      { name: 'EVR/EDVR',          slug: 'hikvision-evr' },
-      { name: 'DVR',               slug: 'hikvision-dvr', subsubs: [{ name: '2MP', slug: 'hikvision-dvr-2mp' }, { name: '5MP', slug: 'hikvision-dvr-5mp' }] },
-      { name: 'IP Cameras',        slug: 'hikvision-ip' },
-      { name: 'Analogue Cameras',  slug: 'hikvision-analogue-cameras' },
-      { name: 'IP Speakers',       slug: 'hikvision-ip-speakers' },
-      { name: 'Analogue Speakers', slug: 'hikvision-analogue-speakers' },
+      { name: 'Refrigerators',    slug: `${b.slug}-refrigerators` },
+      { name: 'Chest Freezers',   slug: `${b.slug}-chest-freezers` },
+      { name: 'Washing Machines', slug: `${b.slug}-washing-machines` },
+      { name: 'Air Conditioners', slug: `${b.slug}-air-conditioners` },
+      { name: 'Televisions',      slug: `${b.slug}-televisions` },
     ],
-  },
-  { name: 'Dahua',      slug: 'dahua',      icon: '/dahu.jpg',
-    subs: [
-      { name: 'NVR',               slug: 'dahua-nvr' },
-      { name: 'DVR',               slug: 'dahua-dvr', subsubs: [{ name: '4MP', slug: 'dahua-dvr-4mp' }, { name: '8MP', slug: 'dahua-dvr-8mp' }] },
-      { name: 'IP Cameras',        slug: 'dahua-ip' },
-      { name: 'Analogue Cameras',  slug: 'dahua-analogue-cameras' },
-      { name: 'IP Speakers',       slug: 'dahua-ip-speakers' },
-      { name: 'Analogue Speakers', slug: 'dahua-analogue-speakers' },
-    ],
-  },
-  { name: 'TP-Link',    slug: 'tp-link',    icon: '/ti.png',   subs: [] },
-  { name: 'D-Link',     slug: 'd-link',     icon: '/dlink.png',subs: [] },
-  { name: 'Panasonic',  slug: 'panasonic',  icon: '/pana.png', subs: [] },
-  { name: 'Hi-Look',    slug: 'hi-look',    icon: '/hilook-seeklogo.png',    subs: [] },
-  { name: 'Grandstream',slug: 'grandstream',icon: '/grandstream.png', subs: [] },
-  { name: 'Alfama',     slug: 'alfama',     icon: '/LOGO ALFAMA-bsl-rvb.png', subs: [] },
-  // ── Product type categories ──
-  { name: 'Addressable Fire Alarm',  slug: 'addressable-fire-alarm',  icon: null, subs: [] },
-  { name: 'Conventional Fire Alarm', slug: 'conventional-fire-alarm', icon: null, subs: [] },
-  { name: 'Solar 4G PTZ Cameras',    slug: 'solar-4g-ptz',            icon: null, subs: [] },
-  { name: 'WiFi Cameras',            slug: 'wifi-cameras',            icon: null, subs: [] },
-  { name: 'Networking Accessories',  slug: 'networking-accessories',  icon: null, subs: [] },
-  { name: 'CCTV Accessories',        slug: 'cctv-accessories',        icon: null, subs: [] },
+  })),
+  // Category-level entries
+  ...APPLIANCE_CATEGORIES.map<Cat>(c => ({
+    name: c.name, slug: c.slug, icon: null, subs: [],
+  })),
 ]
 
-// Placeholder box when no icon image yet
 const Placeholder = ({ name }: { name: string }) => (
   <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
     fontSize: '7px', fontWeight: 900, color: '#9ca3af', textAlign: 'center', lineHeight: 1.1, padding: '2px' }}>
@@ -108,6 +85,7 @@ const Placeholder = ({ name }: { name: string }) => (
 const NAV_LINKS = [
   { label: 'HOME',     href: '/' },
   { label: 'PRODUCTS', href: '/products' },
+  { label: 'GRAND OPENING', href: '/#grand-opening' },
   { label: 'ABOUT',    href: '/about' },
   { label: 'CONTACT',  href: '/contact' },
 ]
@@ -143,7 +121,6 @@ export default function Navbar() {
 
   useEffect(() => { setMobileOpen(false); setMegaOpen(false) }, [pathname])
 
-  // Delay closing mega so mouse can move to sub-panel
   const openMega  = () => { if (closeTimer.current) clearTimeout(closeTimer.current); setMegaOpen(true) }
   const closeMega = () => { closeTimer.current = setTimeout(() => { setMegaOpen(false); setHoveredCat(null) }, 120) }
 
@@ -155,8 +132,6 @@ export default function Navbar() {
     }
   }
 
-  const onHero = pathname === '/'
-  const isDark = onHero && mounted && !scrolled
   const hovCat = CATEGORIES.find(c => c.slug === hoveredCat)
 
   return (
@@ -168,25 +143,25 @@ export default function Navbar() {
         .nav-animate   { animation: navSlideDown 0.45s cubic-bezier(0.16,1,0.3,1) forwards; }
         .mega-animate  { animation: megaDrop 0.18s cubic-bezier(0.16,1,0.3,1) forwards; }
         .mobile-animate{ animation: mobileSlide 0.18s ease forwards; }
-        .cat-row:hover { background: rgba(0,196,154,0.05); }
+        .cat-row:hover { background: rgba(200,16,46,0.05); }
       `}</style>
 
-      {/* ── Top bar ──────────────────────────── */}
-      <div className={`hidden md:block transition-colors duration-300 ${isDark ? 'bg-black/40 border-b border-white/10' : 'bg-white border-b border-gray-100'}`}>
+      {/* ── Top bar: contacts + Grand Opening badge ─────────── */}
+      <div className="hidden md:block bg-[#1a1a1a] text-white/80 border-b border-black/20">
         <div className="max-w-7xl mx-auto px-6 py-1.5 flex justify-between items-center">
           <div className="flex items-center gap-5">
             {[
-              { href: 'tel:+233555517658',                       label: '+233 55 551 7658' },
-              { href: 'tel:+233241050163',                       label: '+233 24 105 0163' },
-              { href: 'mailto:tritechtecnologies2023@gmail.com', label: 'tritechtecnologies2023@gmail.com' },
+              { href: `tel:${COMPANY.phones.primary}`,   label: COMPANY.phones.primaryFmt },
+              { href: `tel:${COMPANY.phones.secondary}`, label: COMPANY.phones.secondaryFmt },
+              { href: `mailto:${COMPANY.email}`,         label: COMPANY.email },
             ].map(({ href, label }) => (
-              <a key={href} href={href} className={`flex items-center gap-1.5 text-xs font-mono transition-colors ${isDark ? 'text-white/50 hover:text-[#00c49a]' : 'text-gray-400 hover:text-[#00c49a]'}`}>
-                <span style={{ color: TEAL, display: 'flex' }}><IconPhone /></span>{label}
+              <a key={href} href={href} className="flex items-center gap-1.5 text-xs font-mono text-white/60 hover:text-white transition-colors">
+                <span style={{ color: RED, display: 'flex' }}><IconPhone /></span>{label}
               </a>
             ))}
           </div>
-          <span className="font-mono text-[9px] tracking-[0.25em] uppercase" style={{ color: TEAL }}>
-            Ghana&apos;s Premier IT &amp; Security Solutions
+          <span className="font-mono text-[10px] tracking-[0.25em] uppercase font-bold" style={{ color: RED }}>
+            GRAND OPENING &nbsp;·&nbsp; {COMPANY.grandOpening.label} &nbsp;·&nbsp; {COMPANY.address.line1.toUpperCase()}
           </span>
         </div>
       </div>
@@ -194,23 +169,26 @@ export default function Navbar() {
       {/* ── Main nav ─────────────────────────── */}
       <nav suppressHydrationWarning
         className={`sticky top-0 z-50 nav-animate ${
-          isDark ? 'bg-[rgba(6,13,26,0.65)] backdrop-blur-xl border-b border-white/10'
-          : scrolled ? 'bg-white/95 backdrop-blur-xl shadow-[0_1px_20px_rgba(0,0,0,0.08)] border-b border-gray-100'
+          scrolled ? 'bg-white/95 backdrop-blur-xl shadow-[0_1px_20px_rgba(0,0,0,0.08)] border-b border-gray-100'
           : 'bg-white border-b border-gray-100'
         }`}
         style={{ transform: visible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.35s cubic-bezier(0.16,1,0.3,1), background 0.3s, box-shadow 0.3s' }}>
 
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between" style={{ height: '68px' }}>
+          <div className="flex items-center justify-between" style={{ height: '72px' }}>
 
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-              <div className="relative w-10 h-10 rounded-xl overflow-hidden ring-1 ring-black/5">
-                <Image src="/logo.jpg" alt="Tritech" fill className="object-contain" sizes="40px" priority />
+              <div className="relative w-11 h-11 rounded-xl overflow-hidden ring-1 ring-black/5 bg-white">
+                <Image src="/intelet-logo.png" alt={COMPANY.name} fill className="object-contain p-1" sizes="44px" priority />
               </div>
               <div className="hidden sm:block">
-                <div className={`font-heading font-black text-base leading-none tracking-widest transition-colors ${isDark ? 'text-white group-hover:text-[#00c49a]' : 'text-gray-900 group-hover:text-[#00c49a]'}`}>TRITECH</div>
-                <div className="text-[9px] font-mono tracking-[0.22em] leading-none mt-0.5" style={{ color: TEAL }}>TECHNOLOGIES LTD</div>
+                <div className="font-heading font-black text-base leading-none tracking-widest text-gray-900 group-hover:text-[#C8102E] transition-colors">
+                  {COMPANY.short}
+                </div>
+                <div className="text-[9px] font-mono tracking-[0.22em] leading-none mt-0.5" style={{ color: RED }}>
+                  ENTERPRISE · APPLIANCES
+                </div>
               </div>
             </Link>
 
@@ -221,21 +199,21 @@ export default function Navbar() {
                 const active = pathname === href || (href === '/products' && pathname.startsWith('/products'))
                 return (
                   <Link key={href} href={href}
-                    className={`relative px-4 py-2 font-heading font-bold text-[11px] tracking-[0.18em] transition-colors duration-200 ${isDark ? (active?'':'text-white/75 hover:text-white') : (active?'':'text-gray-500 hover:text-gray-900')}`}
-                    style={{ color: active ? TEAL : undefined }}>
+                    className={`relative px-4 py-2 font-heading font-bold text-[11px] tracking-[0.18em] transition-colors duration-200 ${active?'':'text-gray-500 hover:text-gray-900'}`}
+                    style={{ color: active ? RED : undefined }}>
                     {label}
                     <span className="absolute bottom-0 left-4 right-4 h-[2px] rounded-full transition-transform duration-300 origin-center"
-                      style={{ backgroundColor: TEAL, transform: active ? 'scaleX(1)' : 'scaleX(0)' }} />
+                      style={{ backgroundColor: RED, transform: active ? 'scaleX(1)' : 'scaleX(0)' }} />
                   </Link>
                 )
               })}
 
               {/* Categories mega trigger */}
               <div className="relative" onMouseEnter={openMega} onMouseLeave={closeMega}>
-                <button className={`relative flex items-center gap-1.5 px-4 py-2 font-heading font-bold text-[11px] tracking-[0.18em] transition-colors duration-200 ${isDark ? 'text-white/75 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`}>
-                  CATEGORIES <IconChevronDown open={megaOpen} />
+                <button className="relative flex items-center gap-1.5 px-4 py-2 font-heading font-bold text-[11px] tracking-[0.18em] transition-colors duration-200 text-gray-500 hover:text-gray-900">
+                  BRANDS <IconChevronDown open={megaOpen} />
                   <span className="absolute bottom-0 left-4 right-4 h-[2px] rounded-full transition-transform duration-300"
-                    style={{ backgroundColor: TEAL, transform: megaOpen ? 'scaleX(1)' : 'scaleX(0)' }} />
+                    style={{ backgroundColor: RED, transform: megaOpen ? 'scaleX(1)' : 'scaleX(0)' }} />
                 </button>
 
                 {megaOpen && (
@@ -244,9 +222,8 @@ export default function Navbar() {
                     onMouseEnter={openMega} onMouseLeave={closeMega}>
                     <div className="flex">
 
-                      {/* Category list — left panel */}
                       <div style={{ width: '270px', flexShrink: 0, padding: '14px 10px' }}>
-                        <p className="text-[9px] font-mono tracking-[0.25em] uppercase mb-2 px-3" style={{ color: '#9ca3af' }}>Browse Categories</p>
+                        <p className="text-[9px] font-mono tracking-[0.25em] uppercase mb-2 px-3" style={{ color: '#9ca3af' }}>Browse Brands & Categories</p>
                         <div style={{ maxHeight: '360px', overflowY: 'auto' }}>
                           {CATEGORIES.map(cat => (
                             <div key={cat.slug} className="cat-row"
@@ -254,15 +231,14 @@ export default function Navbar() {
                               onMouseEnter={() => setHoveredCat(cat.slug)}>
                               <button onClick={() => window.location.href = `/products?category_id=${cat.slug}`}
                                 className="flex items-center gap-2.5 px-3 py-2 group/cat w-full text-left hover:bg-gray-50 transition-colors rounded-lg">
-                                {/* Logo */}
                                 <div style={{ width: '28px', height: '28px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#fff', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3px' }}>
                                   {cat.icon
                                     ? <Image src={cat.icon} alt={cat.name} width={22} height={22} className="object-contain w-full h-full" />
                                     : <Placeholder name={cat.name} />
                                   }
                                 </div>
-                                <span className={`text-xs font-heading font-semibold flex-1 tracking-wide transition-colors ${hoveredCat === cat.slug ? '' : 'text-gray-600 group-hover/cat:text-[#00c49a]'}`}
-                                  style={{ color: hoveredCat === cat.slug ? TEAL : undefined }}>
+                                <span className={`text-xs font-heading font-semibold flex-1 tracking-wide transition-colors ${hoveredCat === cat.slug ? '' : 'text-gray-600 group-hover/cat:text-[#C8102E]'}`}
+                                  style={{ color: hoveredCat === cat.slug ? RED : undefined }}>
                                   {cat.name}
                                 </span>
                                 {cat.subs.length > 0 && <IconChevronRight open={hoveredCat === cat.slug} />}
@@ -271,16 +247,14 @@ export default function Navbar() {
                           ))}
                         </div>
                         <div style={{ borderTop: '1px solid #f3f4f6', marginTop: '8px', paddingTop: '10px', paddingLeft: '12px' }}>
-                          <Link href="/products" className="flex items-center gap-2 text-xs font-heading font-bold transition-all hover:gap-3" style={{ color: TEAL }}>
+                          <Link href="/products" className="flex items-center gap-2 text-xs font-heading font-bold transition-all hover:gap-3" style={{ color: RED }}>
                             View All Products <IconArrow />
                           </Link>
                         </div>
                       </div>
 
-                      {/* Subcategory panel — right, only when a cat with subs is hovered */}
                       {hoveredCat && hovCat && hovCat.subs.length > 0 && (
                         <div style={{ flex: 1, borderLeft: '1px solid #f3f4f6', padding: '14px 14px' }}>
-                          {/* Category logo large */}
                           <div className="flex items-center gap-3 mb-4 px-1">
                             <div style={{ width: '40px', height: '40px', borderRadius: '10px', border: '1px solid #e5e7eb', background: '#fff', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}>
                               {hovCat.icon
@@ -290,32 +264,18 @@ export default function Navbar() {
                             </div>
                             <div>
                               <p className="font-heading font-black text-sm text-gray-800">{hovCat.name}</p>
-                              <p className="text-[9px] font-mono" style={{ color: '#9ca3af' }}>{hovCat.subs.length} subcategories</p>
+                              <p className="text-[9px] font-mono" style={{ color: '#9ca3af' }}>{hovCat.subs.length} product lines</p>
                             </div>
                           </div>
 
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                             {hovCat.subs.map(sub => (
-                              <div key={sub.slug}>
-                                <Link href={`/products?category_id=${sub.slug}`}
-                                  className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-gray-50 transition-all group/sub">
-                                  <span className="text-xs font-heading font-semibold text-gray-600 group-hover/sub:text-[#00c49a] transition-colors tracking-wide">
-                                    {sub.name}
-                                  </span>
-                                  {sub.subsubs && sub.subsubs.length > 0 && (
-                                    <div className="flex gap-1.5">
-                                      {sub.subsubs.map(ss => (
-                                        <Link key={ss.slug} href={`/products?category_id=${ss.slug}`}
-                                          onClick={e => e.stopPropagation()}
-                                          className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold border transition-all hover:border-[#00c49a] hover:text-[#00c49a]"
-                                          style={{ borderColor: '#e5e7eb', color: '#9ca3af' }}>
-                                          {ss.name}
-                                        </Link>
-                                      ))}
-                                    </div>
-                                  )}
-                                </Link>
-                              </div>
+                              <Link key={sub.slug} href={`/products?category_id=${sub.slug}`}
+                                className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-gray-50 transition-all group/sub">
+                                <span className="text-xs font-heading font-semibold text-gray-600 group-hover/sub:text-[#C8102E] transition-colors tracking-wide">
+                                  {sub.name}
+                                </span>
+                              </Link>
                             ))}
                           </div>
                         </div>
@@ -331,24 +291,24 @@ export default function Navbar() {
               {searchOpen ? (
                 <form onSubmit={handleSearch} className="flex items-center gap-1">
                   <input autoFocus type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                    placeholder="Search products…"
-                    className="w-44 border border-gray-200 focus:border-[#00c49a] outline-none px-3 py-1.5 text-sm rounded-xl bg-gray-50 text-gray-800 placeholder-gray-400 transition-all"
+                    placeholder="Search appliances…"
+                    className="w-44 border border-gray-200 focus:border-[#C8102E] outline-none px-3 py-1.5 text-sm rounded-xl bg-gray-50 text-gray-800 placeholder-gray-400 transition-all"
                     style={{ fontSize: '13px' }} />
-                  <button type="submit" className="p-1.5 rounded-xl text-white hover:opacity-90" style={{ backgroundColor: TEAL }}><IconSearch /></button>
+                  <button type="submit" className="p-1.5 rounded-xl text-white hover:opacity-90" style={{ backgroundColor: RED }}><IconSearch /></button>
                   <button type="button" onClick={() => { setSearchOpen(false); setSearchQuery('') }} className="p-1.5 text-gray-400 hover:text-gray-600"><IconX /></button>
                 </form>
               ) : (
-                <button onClick={() => setSearchOpen(true)} className={`p-2 rounded-xl transition-all duration-200 ${isDark ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-gray-400 hover:text-[#00c49a] hover:bg-gray-50'}`}>
+                <button onClick={() => setSearchOpen(true)} className="p-2 rounded-xl transition-all duration-200 text-gray-400 hover:text-[#C8102E] hover:bg-gray-50">
                   <IconSearch />
                 </button>
               )}
-              <a href="https://wa.me/233555517658" target="_blank" rel="noopener noreferrer"
+              <a href={whatsappLink()} target="_blank" rel="noopener noreferrer"
                 className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl text-white text-[11px] font-heading font-black tracking-widest transition-all hover:opacity-90 active:scale-95"
-                style={{ backgroundColor: TEAL }}>
+                style={{ backgroundColor: RED }}>
                 <IconWhatsApp /> WhatsApp
               </a>
               <button onClick={() => setMobileOpen(!mobileOpen)}
-                className={`lg:hidden p-2 rounded-xl transition-all ${isDark ? 'text-white/70 hover:text-white' : 'text-gray-500 hover:text-[#00c49a]'}`}>
+                className="lg:hidden p-2 rounded-xl transition-all text-gray-500 hover:text-[#C8102E]">
                 {mobileOpen ? <IconX /> : <IconMenu />}
               </button>
             </div>
@@ -364,17 +324,16 @@ export default function Navbar() {
                 return (
                   <Link key={href} href={href}
                     className="flex items-center px-4 py-3 font-heading font-bold text-xs tracking-widest rounded-xl transition-colors"
-                    style={active ? { color: TEAL, background: 'rgba(0,196,154,0.06)' } : { color: '#374151' }}>
-                    {active && <span className="w-1.5 h-1.5 rounded-full mr-2.5 flex-shrink-0" style={{ background: TEAL }} />}
+                    style={active ? { color: RED, background: 'rgba(200,16,46,0.06)' } : { color: '#374151' }}>
+                    {active && <span className="w-1.5 h-1.5 rounded-full mr-2.5 flex-shrink-0" style={{ background: RED }} />}
                     {label}
                   </Link>
                 )
               })}
 
-              {/* Mobile categories accordion */}
               <button onClick={() => setMobileCats(!mobileCats)}
                 className="w-full flex items-center justify-between px-4 py-3 font-heading font-bold text-xs tracking-widest text-gray-700 rounded-xl hover:bg-gray-50">
-                CATEGORIES <IconChevronDown open={mobileCats} />
+                BRANDS & CATEGORIES <IconChevronDown open={mobileCats} />
               </button>
 
               {mobileCats && (
@@ -403,22 +362,10 @@ export default function Navbar() {
                       {expandedCat === cat.slug && cat.subs.length > 0 && (
                         <div className="ml-9 mt-0.5 space-y-0.5">
                           {cat.subs.map(sub => (
-                            <div key={sub.slug}>
-                              <Link href={`/products?category_id=${sub.slug}`}
-                                className="flex items-center px-3 py-1.5 rounded-xl hover:bg-gray-50 text-xs font-heading font-semibold text-gray-500 hover:text-[#00c49a] transition-colors">
-                                {sub.name}
-                              </Link>
-                              {sub.subsubs && (
-                                <div className="ml-3 flex gap-1.5 flex-wrap mt-0.5 mb-1.5">
-                                  {sub.subsubs.map(ss => (
-                                    <Link key={ss.slug} href={`/products?category_id=${ss.slug}`}
-                                      className="px-2 py-0.5 rounded-full text-[9px] font-mono border border-gray-200 text-gray-400 hover:border-[#00c49a] hover:text-[#00c49a] transition-colors">
-                                      {ss.name}
-                                    </Link>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
+                            <Link key={sub.slug} href={`/products?category_id=${sub.slug}`}
+                              className="flex items-center px-3 py-1.5 rounded-xl hover:bg-gray-50 text-xs font-heading font-semibold text-gray-500 hover:text-[#C8102E] transition-colors">
+                              {sub.name}
+                            </Link>
                           ))}
                         </div>
                       )}
@@ -428,9 +375,9 @@ export default function Navbar() {
               )}
 
               <div className="pt-2 pb-1">
-                <a href="https://wa.me/233555517658" target="_blank" rel="noopener noreferrer"
+                <a href={whatsappLink()} target="_blank" rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl text-white text-xs font-heading font-black tracking-widest hover:opacity-90"
-                  style={{ backgroundColor: TEAL }}>
+                  style={{ backgroundColor: RED }}>
                   <IconWhatsApp /> WHATSAPP US
                 </a>
               </div>

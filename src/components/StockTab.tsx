@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
+import { COLORS } from '@/lib/brand'
 
 // ─────────────────────────────────────────────────────────────
 // THEME
@@ -12,18 +13,18 @@ interface Theme {
   rowHover: string; tag: string; teal: string; shadow: string;
 }
 const DARK: Theme = {
-  bg: '#060d1a', card: 'rgba(13,31,60,0.85)', border: 'rgba(0,196,154,0.12)',
-  text: '#e2e8f0', sub: '#64748b', muted: '#475569',
-  input: '#0d1f3c', inputBorder: '#2a3a5c', headerBg: 'rgba(0,196,154,0.07)',
-  rowHover: 'rgba(0,196,154,0.04)', tag: 'rgba(0,196,154,0.1)',
-  teal: '#00c49a', shadow: '0 8px 32px rgba(0,0,0,0.5)',
+  bg: '#0a0f1a', card: 'rgba(20,26,40,0.88)', border: 'rgba(200,16,46,0.18)',
+  text: '#e2e8f0', sub: '#94a3b8', muted: '#64748b',
+  input: '#14192a', inputBorder: '#2a2f3e', headerBg: 'rgba(200,16,46,0.08)',
+  rowHover: 'rgba(200,16,46,0.05)', tag: 'rgba(200,16,46,0.12)',
+  teal: COLORS.red, shadow: '0 8px 32px rgba(0,0,0,0.5)',
 }
 const LIGHT: Theme = {
-  bg: '#f0f4f8', card: '#ffffff', border: 'rgba(0,150,120,0.2)',
-  text: '#1a2535', sub: '#64748b', muted: '#94a3b8',
-  input: '#f8fafc', inputBorder: '#cbd5e1', headerBg: 'rgba(0,196,154,0.08)',
-  rowHover: 'rgba(0,196,154,0.06)', tag: 'rgba(0,196,154,0.1)',
-  teal: '#00a880', shadow: '0 8px 32px rgba(0,0,0,0.1)',
+  bg: COLORS.ash, card: COLORS.white, border: COLORS.ashLine,
+  text: COLORS.ink, sub: COLORS.inkSoft, muted: COLORS.inkMuted,
+  input: COLORS.white, inputBorder: COLORS.ashLine, headerBg: COLORS.redSoft,
+  rowHover: 'rgba(200,16,46,0.06)', tag: 'rgba(200,16,46,0.1)',
+  teal: COLORS.red, shadow: '0 8px 32px rgba(0,0,0,0.08)',
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -51,213 +52,12 @@ interface StockItem {
 // ─────────────────────────────────────────────────────────────
 // SEED DATA (only inserted if tables are empty)
 // ─────────────────────────────────────────────────────────────
+const DAYS_1_31 = Array.from({ length: 31 }, (_, i) => String(i + 1))
 const SEED_WAREHOUSES = [
-  { name: 'BACK WAREHOUSE', color: '#00c49a', date_columns: ['15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31'] },
-  { name: 'FISHPONG-1',     color: '#38bdf8', date_columns: ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31'] },
-  { name: 'FISHPONG-2',     color: '#a78bfa', date_columns: ['23','24','25','26','27','28','29','30','31'] },
+  { name: 'MAIN SHOWROOM', color: COLORS.red, date_columns: DAYS_1_31 },
 ]
 
-const SEED_STOCK = [
-  // BACK WAREHOUSE
-  {warehouse:'BACK WAREHOUSE',model:'DS-7208HGHI-M1',opening_stock:216,daily_taken:{'16':8,'20':8,'24':8,'26':8},min_level:10},
-  {warehouse:'BACK WAREHOUSE',model:'DS-7208HGHI-M1/T',opening_stock:72,daily_taken:{'16':8,'17':8,'23':8,'26':8},min_level:10},
-  {warehouse:'BACK WAREHOUSE',model:'IDS-7208HQHI-M1/XT',opening_stock:84,daily_taken:{'17':8,'21':8,'26':3,'30':8},min_level:10},
-  {warehouse:'BACK WAREHOUSE',model:'DS-7216HGHI-M1',opening_stock:40,daily_taken:{'20':8},min_level:10},
-  {warehouse:'BACK WAREHOUSE',model:'DS-7216HGHI-M1/T',opening_stock:56,daily_taken:{'21':8,'26':8},min_level:10},
-  {warehouse:'BACK WAREHOUSE',model:'IDS-7204HQHI-M1/T',opening_stock:48,daily_taken:{'26':8},min_level:10},
-  {warehouse:'BACK WAREHOUSE',model:'DS-7204HGHI-M1/T',opening_stock:96,daily_taken:{'16':8,'17':8,'20':8,'23':8,'24':8,'26':8},min_level:10},
-  {warehouse:'BACK WAREHOUSE',model:'DS-7104NI-Q1/4P/M',opening_stock:32,daily_taken:{'26':3},min_level:8},
-  {warehouse:'BACK WAREHOUSE',model:'DS-7108NI-Q1/8P/M',opening_stock:5,daily_taken:{'16':5},min_level:8},
-  {warehouse:'BACK WAREHOUSE',model:'DS-7608NI-Q1/8P',opening_stock:6,daily_taken:{'20':3},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CE16D0T-LPFS',opening_stock:2155,daily_taken:{'16':50,'20':50,'26':35},min_level:100},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CE76D0T-LPFS',opening_stock:1960,daily_taken:{'16':48,'20':48,'24':48},min_level:100},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CE10DF0T-LPFS',opening_stock:828,daily_taken:{'16':36,'20':36,'24':36},min_level:100},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CE10KF0T-LPFS',opening_stock:200,daily_taken:{'16':36,'20':36,'24':36},min_level:100},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CE70DF0T-LPFS',opening_stock:1656,daily_taken:{'20':36},min_level:100},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CE70KF0T-LPFS',opening_stock:252,daily_taken:{'20':36},min_level:100},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2FA1208-C16 16CH POWER SUPPLY',opening_stock:60,daily_taken:{'20':20,'26':20},min_level:20},
-  {warehouse:'BACK WAREHOUSE',model:'DS-J1427204HGH1-M1+2+2 CAM',opening_stock:17,daily_taken:{'20':2},min_level:5},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CD1347G3-LIU',opening_stock:127,daily_taken:{},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CE70D0T-PTLTS',opening_stock:51,daily_taken:{},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CD1143G2-LIU',opening_stock:27,daily_taken:{'16':8},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CD1123G2-LIU',opening_stock:104,daily_taken:{'16':20,'20':20,'26':17},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CD1327G2H-LIUF/SRB',opening_stock:27,daily_taken:{'20':4},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2DE2C400MWG-E',opening_stock:18,daily_taken:{'16':9},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2DE2C400MWG-4G',opening_stock:24,daily_taken:{'20':2},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CD1183G2-LIU',opening_stock:10,daily_taken:{'16':8},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-UPS-3000',opening_stock:10,daily_taken:{'20':2},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-UPS-1000',opening_stock:10,daily_taken:{'16':4,'20':3},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CD1047G3-LIU',opening_stock:62,daily_taken:{'16':22,'20':22},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CD1023G2-LIU',opening_stock:180,daily_taken:{'16':18,'20':18,'24':18},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-KIT344MBFWX-E1',opening_stock:5,daily_taken:{'20':3},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CD1083G2-LIU',opening_stock:13,daily_taken:{'16':13},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-K7M-AW24',opening_stock:36,daily_taken:{'20':6},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'EPSON-L3250',opening_stock:35,daily_taken:{'20':4},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'EPSON-L3252',opening_stock:7,daily_taken:{'16':3,'20':2},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'WALKIE TALKIES BAOFENG BF-885',opening_stock:81,daily_taken:{'16':8,'20':8},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'POE424G',opening_stock:13,daily_taken:{'20':3},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'PS316G',opening_stock:30,daily_taken:{'16':10,'20':10},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'PS208G',opening_stock:40,daily_taken:{'16':10,'20':10},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-K4H255 X',opening_stock:60,daily_taken:{},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CE76DOT-EXIPF',opening_stock:120,daily_taken:{},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'SOLID-UPS2000Va',opening_stock:30,daily_taken:{},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'SOLID-UPS1000Va',opening_stock:40,daily_taken:{'16':8},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CD1367G2HP-LIUF/SRB',opening_stock:35,daily_taken:{'16':1},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CD2T87G3-LIS2UY/SRB',opening_stock:9,daily_taken:{},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-7764NI-M4',opening_stock:2,daily_taken:{'16':1},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'CORNER MOUNT BRACKET PFA-151',opening_stock:5,daily_taken:{},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-3WAP623E-SI',opening_stock:4,daily_taken:{},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CE72DF0T-LPTS',opening_stock:30,daily_taken:{},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CD1027G2-L',opening_stock:3,daily_taken:{},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-2CE72DF3T-PIRXOS',opening_stock:4,daily_taken:{},min_level:null},
-  {warehouse:'BACK WAREHOUSE',model:'DS-QAE0A60G1-VB',opening_stock:6,daily_taken:{'16':1},min_level:null},
-  // FISHPONG-1
-  {warehouse:'FISHPONG-1',model:'JA-T08B-4G-EU',opening_stock:100,daily_taken:{'17':6,'18':4,'23':4,'25':4},min_level:null},
-  {warehouse:'FISHPONG-1',model:'T34-EU-4G',opening_stock:20,daily_taken:{'17':6,'20':2,'23':4,'25':4},min_level:null},
-  {warehouse:'FISHPONG-1',model:'SOLID-UPS1500Va',opening_stock:96,daily_taken:{'18':2,'19':2,'25':2,'26':2},min_level:null},
-  {warehouse:'FISHPONG-1',model:'SOLID-UPS2000Va',opening_stock:78,daily_taken:{'17':4,'18':2,'19':2},min_level:null},
-  {warehouse:'FISHPONG-1',model:'SOLID-UPS1000Va',opening_stock:8,daily_taken:{'19':4},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DH-PFM9201-6UN-C INDOOR COPPER',opening_stock:20,daily_taken:{'20':4},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DH-PFM9221-6UN-C-INDOOR',opening_stock:68,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'WESTA 12U',opening_stock:26,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'WESTA 7U',opening_stock:33,daily_taken:{'17':1},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CD1347G2H-LIUF/SRB',opening_stock:59,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'JUNCTION BOX SMALL',opening_stock:71,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'FACE PLATE SINGLE DS-IF PA I',opening_stock:120,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DIGITAL MULTIMETER DT920SA',opening_stock:15,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'EXIT BUTTON NU TOUCH WITH REMOTE',opening_stock:42,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CD2T43G2-4LI2U',opening_stock:10,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CD2T63G2-4LIZU',opening_stock:31,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-KAS321',opening_stock:21,daily_taken:{'17':1},min_level:null},
-  {warehouse:'FISHPONG-1',model:'ROUND JUNCTION BOX BIG',opening_stock:700,daily_taken:{'17':200,'20':200},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CE76UOT-LPF',opening_stock:36,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'HF-S2 SMOKE DETECTOR',opening_stock:73,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'POE REPEATER 2 IN 1',opening_stock:40,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'VI-K43P',opening_stock:18,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'VI-K23P',opening_stock:22,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CD1147G2-L',opening_stock:24,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CD1147G2H-LIU',opening_stock:108,daily_taken:{'17':27,'20':27},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CD1163G2H-LIU',opening_stock:37,daily_taken:{'17':9},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CD1027G2H-LIU',opening_stock:54,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CD1047G2H-LIUF/SRB',opening_stock:18,daily_taken:{'17':18},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CD1027G2H-LIU/SRB',opening_stock:36,daily_taken:{'17':18},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CD1023G2-LIU',opening_stock:108,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'VI-K13P',opening_stock:32,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'GSP-1625 GRAND-STEAM',opening_stock:128,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-KIT320MFWX',opening_stock:41,daily_taken:{'17':3,'20':3},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DIR-612M',opening_stock:26,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'D-LINK 4G ROUTER G403C',opening_stock:17,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DWR-M922',opening_stock:19,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-KH2230T',opening_stock:18,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'LAN JOINER SINGLE',opening_stock:4300,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'CAMERA POLE SMALL CURVE',opening_stock:71,daily_taken:{'17':14,'20':13},min_level:null},
-  {warehouse:'FISHPONG-1',model:'60M HDMI EXTENDER',opening_stock:22,daily_taken:{'17':4,'20':4},min_level:null},
-  {warehouse:'FISHPONG-1',model:'CCTV MALE POWER PIN',opening_stock:6600,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'BNC CONNECTOR COPPER',opening_stock:1000,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'CAMERA STAND 60/120 L',opening_stock:158,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'LINXTER UPS BATTERY 12V9A',opening_stock:190,daily_taken:{'17':15,'20':15},min_level:null},
-  {warehouse:'FISHPONG-1',model:'BNC GREEN/BLACK',opening_stock:1700,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CE10KF0T-LPTS',opening_stock:100,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CE72KF0T-LPTS',opening_stock:100,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CFSP4/4G',opening_stock:30,daily_taken:{'17':11,'20':11},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-KIA8503MF-B',opening_stock:15,daily_taken:{'17':3},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-KIS302-P',opening_stock:13,daily_taken:{'17':13},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2FA1205-C8',opening_stock:50,daily_taken:{'17':5,'20':5},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-KIS603-P',opening_stock:20,daily_taken:{'17':2},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CD1027G3-LIU/SRB',opening_stock:50,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-KH6320 WTEI',opening_stock:28,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-1LN6-UU HIKVISION CABLE COPPER',opening_stock:30,daily_taken:{'17':1},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2SE-4C225MWG-E/26-FO',opening_stock:11,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CD2T47G2P-LSU/SL',opening_stock:9,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CD2346CT2P-LSU/SL',opening_stock:3,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2CD2347G2P-LSU/SI',opening_stock:11,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'HIKVISION DOOR CLOSER DS-K4DCI03',opening_stock:27,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'SENIOR DOOR CLOSER 062',opening_stock:10,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'CAMERA STAND 30/60L',opening_stock:25,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'CAMERA POLE MOUNT OH-EAFI52-E',opening_stock:100,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-PHA64-KIT-WE(B)',opening_stock:6,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-PWA64-KIT-WE AXPRO',opening_stock:12,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-QAEO210G1-V',opening_stock:20,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-2FA1208-C8',opening_stock:50,daily_taken:{'17':10},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-KIT321 MFWX',opening_stock:21,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-KIT808 MFWX',opening_stock:14,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-QAEOK60206-4',opening_stock:15,daily_taken:{'17':2},min_level:null},
-  {warehouse:'FISHPONG-1',model:'DS-KIA8503MF-B (2)',opening_stock:15,daily_taken:{'17':3},min_level:null},
-  // FISHPONG-2
-  {warehouse:'FISHPONG-2',model:'DS-2DE2C400IWG-K/4G/C05S10',opening_stock:94,daily_taken:{'24':2},min_level:null},
-  {warehouse:'FISHPONG-2',model:'RBX-S10',opening_stock:204,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'AXIOM 305M CAT 6 CABLE',opening_stock:214,daily_taken:{'23':6},min_level:null},
-  {warehouse:'FISHPONG-2',model:'LINSTAR 305M CAT 6 CABLE',opening_stock:64,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'6U CABINENT',opening_stock:109,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'D-LINK 305M CAT 6 INDOOR CABLE',opening_stock:16,daily_taken:{'23':3},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-NVR1108HS-8P-S3/H',opening_stock:33,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DHI-NVR2216-4KS3',opening_stock:5,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-CS4226-24ET-375',opening_stock:5,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-XVRIB16H-I',opening_stock:10,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-XVRIB16-I/T',opening_stock:32,daily_taken:{'23':2},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-XVRIBO4H-I/T',opening_stock:20,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-XVRIBO4-I/T',opening_stock:35,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-IPC-HFW1239TL1-A-IL',opening_stock:60,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-IPC-HFW1429TL1-A-IL',opening_stock:120,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-IPC-HDW1239V-A-IL',opening_stock:60,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-IPC-HDW1439TI-A-LED',opening_stock:40,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-IPC-HDW1439V-A-IL',opening_stock:139,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-HAC-HDW1509CLQP-A-LED',opening_stock:78,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-HAC-HFW1209CLP-A-LED',opening_stock:72,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-BIA2IP-U',opening_stock:72,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-HAC-HFW1509CLP-A-LED',opening_stock:60,daily_taken:{'23':6},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-HAC-T1A21P-U',opening_stock:120,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-PFA12A',opening_stock:180,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DHI-NVR4432-4K32-4KS3',opening_stock:3,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'ST-538-6M-4G',opening_stock:47,daily_taken:{'23':1},min_level:null},
-  {warehouse:'FISHPONG-2',model:'4G-(EU) SMALL',opening_stock:28,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'ST-517C-3M-4G',opening_stock:79,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'ST-558-6M-12X-4G',opening_stock:48,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'ST-698-6M-36X-4G',opening_stock:6,daily_taken:{'23':1},min_level:null},
-  {warehouse:'FISHPONG-2',model:'9U-CABINET',opening_stock:62,daily_taken:{'23':2},min_level:null},
-  {warehouse:'FISHPONG-2',model:'HDMI CABLE 1.5M',opening_stock:591,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'HDMI 4K 1X16 SPLITTER',opening_stock:9,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'JUNCTION BOX BIG',opening_stock:400,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'12V 3A',opening_stock:70,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'HDMI SPLITTER 4PORT',opening_stock:240,daily_taken:{'23':10},min_level:null},
-  {warehouse:'FISHPONG-2',model:'HDMI SPLITTER 2 PORT',opening_stock:150,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'QS-V5',opening_stock:190,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'HDMI CABLE 3M',opening_stock:122,daily_taken:{'23':43},min_level:null},
-  {warehouse:'FISHPONG-2',model:'15M HDMI CABLE',opening_stock:65,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'20M HDMI CABLE',opening_stock:40,daily_taken:{'23':10},min_level:null},
-  {warehouse:'FISHPONG-2',model:'30 HDMI CABLE',opening_stock:100,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'10M HDMI CABLE',opening_stock:66,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'RJ11 CONNECTORS',opening_stock:4550,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'HDMI 4K 1X8 SPLITTER',opening_stock:84,daily_taken:{'23':3},min_level:null},
-  {warehouse:'FISHPONG-2',model:'VIDEO BALUN 8MP',opening_stock:1000,daily_taken:{'23':400},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DAHUA MALE POWER PIN',opening_stock:20000,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DUAL-BRACKET',opening_stock:171,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'1U CABINET',opening_stock:16,daily_taken:{'23':10},min_level:null},
-  {warehouse:'FISHPONG-2',model:'HDMI TO CAT6 EXTENDER 30M',opening_stock:27,daily_taken:{'23':10},min_level:null},
-  {warehouse:'FISHPONG-2',model:'UL1804 4G SOLAR CAMERA',opening_stock:20,daily_taken:{'26':8},min_level:null},
-  {warehouse:'FISHPONG-2',model:'WESTA CRIMPING TOOL PASS-THROUGH',opening_stock:90,daily_taken:{'23':20},min_level:null},
-  {warehouse:'FISHPONG-2',model:'298 CRIMPING TOOL PASS-THROUGH',opening_stock:30,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'FIBRE OPTIC 50M',opening_stock:16,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'OH-CS4010-8ET2GT-110',opening_stock:23,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'CAMERA MOUNT CURVE SHORT',opening_stock:29,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'2L-BRACKET',opening_stock:63,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'4U CABINET 600X600',opening_stock:2,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'6U CABINET 600X600',opening_stock:2,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-P513PV',opening_stock:5,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'ST-LCS58-6M-4G',opening_stock:7,daily_taken:{'23':1},min_level:null},
-  {warehouse:'FISHPONG-2',model:'ST-515-6M-12X-4G',opening_stock:16,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'ST-598-6M-20X-4G',opening_stock:7,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-HAC-PTS1500CP-E2-IL-A',opening_stock:5,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'CABLE TRACKER',opening_stock:150,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'HDMI CABLE 10M',opening_stock:66,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'NETWORK CABLE TESTER (YELLOW)',opening_stock:7,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'NETWORK CABLE TESTER (BLUE)',opening_stock:15,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DIGITAL MULTIMETER',opening_stock:10,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'PS-P15IP15B',opening_stock:50,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'HDMI SPLITTER 4K 1X8',opening_stock:84,daily_taken:{'23':3},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-NVR4232-16P-4KS3',opening_stock:1,daily_taken:{},min_level:null},
-  {warehouse:'FISHPONG-2',model:'DH-T4A-PV',opening_stock:10,daily_taken:{},min_level:null},
-]
+const SEED_STOCK: any[] = []
 
 // ─────────────────────────────────────────────────────────────
 // HELPERS
@@ -313,7 +113,7 @@ function WarehouseModal({ wh, onSave, onClose, T, dark }: {
   dark: boolean
 }) {
   const [name,     setName]     = useState(wh.name || '')
-  const [color,    setColor]    = useState(wh.color || '#00c49a')
+  const [color,    setColor]    = useState(wh.color || COLORS.red)
   const [datesRaw, setDatesRaw] = useState((wh.date_columns || []).join(', '))
   const [err,      setErr]      = useState('')
 
@@ -491,7 +291,7 @@ function StockModal({ item, warehouses, onSave, onClose, T, dark }: {
         <div style={{
           display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(100px,1fr))', gap: 10, marginBottom: 24,
           padding: 14, borderRadius: 10,
-          background: dark ? 'rgba(0,196,154,0.05)' : 'rgba(0,196,154,0.06)',
+          background: dark ? 'rgba(200,16,46,0.06)' : 'rgba(200,16,46,0.06)',
           border: `1px solid ${T.teal}25`,
         }}>
           {[
@@ -602,10 +402,16 @@ export default function StockTab({ darkMode, onToggleDark }: { darkMode: boolean
 
   useEffect(() => {
     const init = async () => {
-      const [whs, stock] = await Promise.all([fetchWarehouses(), fetchStock()])
-      setWarehouses(whs)
-      setData(stock)
-      setLoading(false)
+      try {
+        const [whs, stock] = await Promise.all([fetchWarehouses(), fetchStock()])
+        setWarehouses(whs)
+        setData(stock)
+      } catch (err: any) {
+        showToast('Stock init failed: ' + (err?.message || 'unknown'), false)
+      } finally {
+        setSeeding(false)
+        setLoading(false)
+      }
     }
     init()
   }, [])
@@ -711,7 +517,7 @@ export default function StockTab({ darkMode, onToggleDark }: { darkMode: boolean
     const a    = document.createElement('a')
     a.href     = url
     const label = warehouse === 'ALL' ? 'ALL_WAREHOUSES' : warehouse.replace(/ /g, '_')
-    a.download  = `Tritech_Stock_${label}_${new Date().toISOString().slice(0, 10)}.csv`
+    a.download  = `Intelet_Stock_${label}_${new Date().toISOString().slice(0, 10)}.csv`
     document.body.appendChild(a); a.click(); document.body.removeChild(a)
     URL.revokeObjectURL(url)
     showToast(`Exported ${rows.length} items ✓`)

@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next'
+import { COMPANY } from '@/lib/brand'
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -9,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin', '/admin/login', '/order'],
       },
     ],
-    sitemap: 'https://www.tritechtechnologiesltd.com/sitemap.xml',
-    host: 'https://www.tritechtechnologiesltd.com',
+    sitemap: `${COMPANY.baseUrl}/sitemap.xml`,
+    host: COMPANY.baseUrl,
   }
 }

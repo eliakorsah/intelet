@@ -1,21 +1,23 @@
 import type { Metadata } from 'next'
 import ProductsClientContent from '@/components/ProductsClientContent'
+import { COMPANY } from '@/lib/brand'
 
 export const metadata: Metadata = {
   title: 'Products',
-  description: 'Browse 1000+ genuine IT and security products — CCTV cameras, NVRs, DVRs, access control, networking equipment and more. Authorized dealer for Hikvision, Dahua, TP-Link, D-Link, Panasonic and more. Competitive wholesale & retail prices with delivery across Ghana.',
+  description: `Browse genuine home appliances at ${COMPANY.name} — fridges, chest freezers, washing machines, air conditioners and televisions from Samsung, Midea, Bruhm, Tamashi, TCL, NASCO and Haier. Grand Opening DISCOUNTS ${COMPANY.grandOpening.label}.`,
   keywords: [
-    'buy CCTV Ghana', 'Hikvision camera price Ghana', 'Dahua NVR Ghana', 'TP-Link switch Ghana',
-    'access control system Ghana', 'IP cameras Accra', 'security equipment Ghana wholesale',
-    'networking equipment Ghana', 'fire alarm system Ghana', 'IT equipment Ghana price',
+    'buy fridge Ghana', 'chest freezer Ghana', 'washing machine Ghana', 'air conditioner Ghana',
+    'television Accra', 'Samsung fridge Ghana', 'Midea AC Ghana', 'Bruhm freezer Ghana',
+    'Tamashi washing machine Ghana', 'TCL TV Ghana', 'NASCO appliances Ghana', 'Haier Ghana',
+    'Grand Opening discounts Ghana',
   ],
   openGraph: {
-    title: 'IT & Security Products | Tritech Technologies Ghana',
-    description: 'Browse 1000+ genuine CCTV, networking, access control and IT products from authorized brands. Best prices in Ghana.',
-    url: 'https://www.tritechtechnologiesltd.com/products',
+    title: `Home Appliances | ${COMPANY.name} Ghana`,
+    description: `Fridges, freezers, washers, ACs and TVs — genuine brands with a 12-month warranty. Grand Opening ${COMPANY.grandOpening.label}.`,
+    url: `${COMPANY.baseUrl}/products`,
     images: [{ url: '/preview.jpg', width: 1200, height: 630 }],
   },
-  alternates: { canonical: 'https://www.tritechtechnologiesltd.com/products' },
+  alternates: { canonical: `${COMPANY.baseUrl}/products` },
 }
 
 export default function ProductsPage() {

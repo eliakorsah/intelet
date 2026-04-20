@@ -1,17 +1,22 @@
 import type { Metadata } from 'next'
 import ContactForm from '@/components/ContactForm'
+import { COMPANY } from '@/lib/brand'
 
 export const metadata: Metadata = {
   title: 'Contact Us',
-  description: 'Get in touch with Tritech Technologies Ghana. Call +233 55 551 7658, WhatsApp us, or send an email. Located in Accra, Ghana. Free consultation available.',
-  keywords: ['contact Tritech Technologies', 'IT company Accra Ghana', 'CCTV supplier contact Ghana', 'security solutions consultation Ghana'],
+  description: `Get in touch with ${COMPANY.name}. Call ${COMPANY.phones.primaryFmt}, WhatsApp us, or visit our showroom at ${COMPANY.address.line1}, next to MTN on the N1 Highway, ${COMPANY.address.city}.`,
+  keywords: [
+    'contact Intelet Enterprise', 'Intelet Ghana contact',
+    'home appliances Lapaz Akweteyman', 'appliance showroom Accra',
+    'Intelet phone', 'Intelet WhatsApp',
+  ],
   openGraph: {
-    title: 'Contact Tritech Technologies Ghana',
-    description: 'Reach us by phone, WhatsApp, or email for IT equipment, CCTV, security and networking solutions in Ghana.',
-    url: 'https://www.tritechtechnologiesltd.com/contact',
+    title: `Contact ${COMPANY.name}`,
+    description: `Reach us by phone, WhatsApp, or visit the showroom at ${COMPANY.address.line1} — Grand Opening ${COMPANY.grandOpening.label}.`,
+    url: `${COMPANY.baseUrl}/contact`,
     images: [{ url: '/preview.jpg', width: 1200, height: 630 }],
   },
-  alternates: { canonical: 'https://www.tritechtechnologiesltd.com/contact' },
+  alternates: { canonical: `${COMPANY.baseUrl}/contact` },
 }
 
 export default function ContactPage() {

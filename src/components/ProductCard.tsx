@@ -4,15 +4,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { COMPANY, COLORS } from '@/lib/brand'
 
-const TEAL = '#00c49a'
-const WA_NUMBER = '233555517658'
-
-const brandLogos: Record<string, string> = {
-  'Hikvision': '/hik.png', 'Dahua': '/dahu.jpg', 'TP-Link': '/ti.png',
-  'Tenda': '/tenda.png', 'JDVISION': '/uy.jpg', 'CISCO': '/cisco.jpg',
-  'D-Link': '/dlink.png', 'Panasonic': '/pana.png',
-}
+const RED = COLORS.red
+const WA_NUMBER = COMPANY.whatsapp.number
 
 const IconBox = () => (
   <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -45,8 +40,8 @@ interface Product {
   [key: string]: any
 }
 
-// Name changed to TritechProductCard to bust Turbopack module cache
-function TritechProductCard({ product }: { product: Product }) {
+// Name changed to InteletProductCard to bust Turbopack module cache
+function InteletProductCard({ product }: { product: Product }) {
   const images   = (product.images || []).filter(Boolean)
   const hasMulti = images.length > 1
 
@@ -81,7 +76,6 @@ function TritechProductCard({ product }: { product: Product }) {
   const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(
     `Hello, I'm interested in the ${product.title} (${product.model_number}). Can you provide more details?`
   )}`
-  const logo    = brandLogos[product.brand]
   const src     = mounted ? (images[imgIdx] || '') : (images[0] || '')
   const showImg = !!src && !imgError
 
@@ -111,8 +105,8 @@ function TritechProductCard({ product }: { product: Product }) {
 
         <div className="absolute top-3 right-3 px-2 py-0.5 rounded-lg text-[9px] font-mono tracking-wider font-bold"
           style={product.in_stock
-            ? { background: 'rgba(0,196,154,0.2)', color: TEAL, border: '1px solid rgba(0,196,154,0.3)' }
-            : { background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' }}>
+            ? { background: COLORS.white, color: RED, border: `1px solid ${RED}` }
+            : { background: 'rgba(239,68,68,0.15)', color: '#b91c1c', border: '1px solid rgba(239,68,68,0.3)' }}>
           {product.in_stock ? '● IN STOCK' : '○ OUT'}
         </div>
 
@@ -124,7 +118,7 @@ function TritechProductCard({ product }: { product: Product }) {
                 {images.map((_, i) => (
                   <button key={i} onClick={e => goTo(i, e)}
                     className="rounded-full transition-all duration-300"
-                    style={{ width: i === imgIdx ? '18px' : '6px', height: '6px', background: i === imgIdx ? TEAL : 'rgba(255,255,255,0.65)' }} />
+                    style={{ width: i === imgIdx ? '18px' : '6px', height: '6px', background: i === imgIdx ? RED : 'rgba(255,255,255,0.75)' }} />
                 ))}
               </div>
             )}
@@ -134,22 +128,23 @@ function TritechProductCard({ product }: { product: Product }) {
 
       <div className="flex flex-col flex-1 p-4">
         <div className="text-[9px] text-gray-400 font-mono tracking-widest mb-1 uppercase">{product.model_number}</div>
-        <h3 className="font-bold text-gray-900 leading-snug mb-2 line-clamp-2 hover:text-[#00c49a] transition-colors"
-          style={{ fontSize: '0.875rem' }}>
+        <h3 className="font-bold leading-snug mb-2 line-clamp-2 transition-colors"
+          style={{ fontSize: '0.875rem', color: COLORS.ink }}>
           {product.title}
         </h3>
         {product.description && (
-          <p className="text-gray-400 text-xs line-clamp-2 mb-3 leading-relaxed">{product.description}</p>
+          <p className="text-xs line-clamp-2 mb-3 leading-relaxed" style={{ color: COLORS.inkMuted }}>{product.description}</p>
         )}
         <div className="mt-auto">
           {product.price && (
-            <div className="font-black text-xl mb-3" style={{ color: TEAL }}>
+            <div className="font-black text-xl mb-3" style={{ color: RED }}>
               GH₵ {product.price.toLocaleString()}
             </div>
           )}
           <div className="flex gap-2">
             <Link href={`/products/${encodeURIComponent(product.brand)}/${product.id}`}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-black tracking-widest border border-gray-200 text-gray-600 hover:border-[#00c49a] hover:text-[#00c49a] transition-all uppercase">
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-black tracking-widest transition-all uppercase"
+              style={{ border: `1px solid ${COLORS.ashLine}`, color: COLORS.inkSoft, background: COLORS.white }}>
               <IconEye /> View
             </Link>
             <a href={waUrl} target="_blank" rel="noopener noreferrer"
@@ -164,4 +159,4 @@ function TritechProductCard({ product }: { product: Product }) {
   )
 }
 
-export default TritechProductCard
+export default InteletProductCard

@@ -1,7 +1,8 @@
 import { MetadataRoute } from 'next'
 import { supabase } from '@/lib/supabase'
+import { COMPANY } from '@/lib/brand'
 
-const BASE = 'https://www.tritechtechnologiesltd.com'
+const BASE = COMPANY.baseUrl
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages

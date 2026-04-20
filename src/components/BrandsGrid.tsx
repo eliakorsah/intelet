@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { COLORS } from '@/lib/brand'
 
-const TEAL = '#00d4aa'
+const RED = COLORS.red
 
 interface Props {
   brands: string[]
@@ -53,8 +54,8 @@ export default function BrandsGrid({ brands, logos }: Props) {
           }}
           onMouseEnter={e => {
             const el = e.currentTarget
-            el.style.borderColor = TEAL
-            el.style.boxShadow = '0 8px 30px rgba(0,212,170,0.12)'
+            el.style.borderColor = RED
+            el.style.boxShadow = '0 8px 30px rgba(200,16,46,0.14)'
             el.style.transform = 'translateY(-3px)'
           }}
           onMouseLeave={e => {
@@ -72,7 +73,10 @@ export default function BrandsGrid({ brands, logos }: Props) {
               className="object-contain w-full h-full transition-transform duration-300 group-hover:scale-110"
             />
           </div>
-          <span className="font-heading font-bold text-[9px] tracking-widest text-gray-400 group-hover:text-[#00d4aa] transition-colors leading-tight uppercase">
+          <span
+            className="font-heading font-bold text-[9px] tracking-widest transition-colors leading-tight uppercase"
+            style={{ color: COLORS.inkSoft }}
+          >
             {brand}
           </span>
         </Link>

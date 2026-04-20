@@ -4,6 +4,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import ProductImageGallery from '@/components/ProductImageGallery'
+import { COMPANY, COLORS, PARTNER_BRANDS, whatsappLink } from '@/lib/brand'
+
+const RED = COLORS.red
+
+const brandLogos: Record<string, string> = Object.fromEntries(
+  PARTNER_BRANDS.map(b => [b.name, b.logo])
+)
 
 export async function generateMetadata(
   { params }: { params: Promise<{ brand: string; id: string }> }
@@ -14,35 +21,26 @@ export async function generateMetadata(
   const p = data?.[0]
   if (!p) return { title: 'Product Not Found' }
 
-  const title = `${p.title} — ${brand} | Tritech Technologies Ghana`
+  const title = `${p.title} — ${brand} | ${COMPANY.name}`
   const description = p.description
-    ? `${p.description.slice(0, 150)}... Buy ${p.title} (${p.model_number}) from Tritech Technologies Ghana. ${p.price ? `GH₵ ${p.price.toLocaleString()}.` : ''} Authorized dealer with nationwide delivery.`
-    : `Buy ${p.title} (${p.model_number}) from Tritech Technologies Ghana. Authorized ${brand} dealer with genuine products and nationwide delivery.`
+    ? `${p.description.slice(0, 150)}… Buy ${p.title} (${p.model_number}) from ${COMPANY.name}. ${p.price ? `GH₵ ${p.price.toLocaleString()}.` : ''} 12-month warranty, delivery available.`
+    : `Buy ${p.title} (${p.model_number}) from ${COMPANY.name}. Genuine ${brand} with a 12-month warranty.`
   const image = p.images?.[0]
 
   return {
     title,
     description,
-    keywords: [p.title, p.model_number, brand, 'Ghana', 'buy', 'price', 'Tritech Technologies'],
+    keywords: [p.title, p.model_number, brand, 'Ghana', 'buy', 'price', COMPANY.name, 'home appliance'],
     openGraph: {
       title,
       description,
-      url: `https://www.tritechtechnologiesltd.com/products/${encodeURIComponent(brand)}/${id}`,
+      url: `${COMPANY.baseUrl}/products/${encodeURIComponent(brand)}/${id}`,
       images: image ? [{ url: image, alt: p.title }] : [{ url: '/preview.jpg' }],
       type: 'website',
     },
     twitter: { card: 'summary_large_image', title, description, images: image ? [image] : ['/preview.jpg'] },
-    alternates: { canonical: `https://www.tritechtechnologiesltd.com/products/${encodeURIComponent(brand)}/${id}` },
+    alternates: { canonical: `${COMPANY.baseUrl}/products/${encodeURIComponent(brand)}/${id}` },
   }
-}
-
-const TEAL = '#00c49a'
-const WA_NUMBER = '233555517658'
-
-const brandLogos: Record<string, string> = {
-  'Hikvision': '/hik.png', 'Dahua': '/dahu.jpg', 'TP-Link': '/ti.png',
-  'Hi-Look': '/hi-look.png', 'Grandstream': '/grandstream.png', 'Alfama': '/alfama.png',
-  'D-Link': '/dlink.png', 'Panasonic': '/pana.png',
 }
 
 const IconArrow = () => (
@@ -71,9 +69,7 @@ export default async function ProductPage({
 }: {
   params: Promise<{ brand: string; id: string }>
 }) {
-  // Next.js 15+ — params is always a Promise, must be awaited
-  const { brand: rawBrand, id } = await params
-  const brand = decodeURIComponent(rawBrand)
+  const { id } = await params
 
   const { data: rows, error } = await supabase
     .from('products')
@@ -94,26 +90,26 @@ export default async function ProductPage({
     .neq('id', id)
     .limit(4)
 
-  const waMsg = encodeURIComponent(`Hello, I'm interested in the *${product.title}* (${product.model_number}). Please provide pricing and availability.`)
-  const waUrl = `https://wa.me/${WA_NUMBER}?text=${waMsg}`
+  const waMsg = encodeURIComponent(`Hello ${COMPANY.name}, I'm interested in the *${product.title}* (${product.model_number}). Please share pricing and availability.`)
+  const waUrl = whatsappLink(waMsg)
   const logo  = brandLogos[product.brand]
   const images = (product.images || []).filter(Boolean)
   const specs  = product.specifications && Object.keys(product.specifications).length > 0
     ? product.specifications as Record<string, string> : null
 
   return (
-    <div style={{ background: '#f7f8fc', minHeight: '100vh' }}>
+    <div style={{ background: COLORS.ash, minHeight: '100vh' }}>
 
       {/* Breadcrumb */}
-      <div style={{ background: '#fff', borderBottom: '1px solid #eef0f4' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-2 text-xs font-mono flex-wrap" style={{ color: '#9ca3af' }}>
-          <Link href="/" className="hover:text-[#00c49a] transition-colors">Home</Link>
+      <div style={{ background: COLORS.white, borderBottom: `1px solid ${COLORS.ashLine}` }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-2 text-xs font-mono flex-wrap" style={{ color: COLORS.inkMuted }}>
+          <Link href="/" className="transition-colors hover:text-[#C8102E]">Home</Link>
           <span>/</span>
-          <Link href="/products" className="hover:text-[#00c49a] transition-colors">Products</Link>
+          <Link href="/products" className="transition-colors hover:text-[#C8102E]">Products</Link>
           <span>/</span>
-          <Link href={`/products?brand=${product.brand}`} className="hover:text-[#00c49a] transition-colors">{product.brand}</Link>
+          <Link href={`/products?brand=${encodeURIComponent(product.brand)}`} className="transition-colors hover:text-[#C8102E]">{product.brand}</Link>
           <span>/</span>
-          <span className="truncate max-w-[180px]" style={{ color: '#4b5563' }}>{product.title}</span>
+          <span className="truncate max-w-[180px]" style={{ color: COLORS.ink }}>{product.title}</span>
         </div>
       </div>
 
@@ -125,87 +121,106 @@ export default async function ProductPage({
           <div className="flex flex-col">
             {/* Brand row */}
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-11 h-11 rounded-xl overflow-hidden flex items-center justify-center bg-white border border-gray-200 shadow-sm flex-shrink-0">
+              <div className="w-11 h-11 rounded-xl overflow-hidden flex items-center justify-center bg-white flex-shrink-0"
+                style={{ border: `1px solid ${COLORS.ashLine}`, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                 {logo
                   ? <Image src={logo} alt={product.brand} width={32} height={32} className="object-contain w-8 h-8" />
-                  : <span className="text-[8px] font-black text-gray-600 text-center px-1 leading-tight">{product.brand}</span>
+                  : <span className="text-[8px] font-black text-center px-1 leading-tight" style={{ color: COLORS.inkSoft }}>{product.brand}</span>
                 }
               </div>
               <div>
-                <p className="font-mono text-[10px] tracking-widest font-bold uppercase" style={{ color: TEAL }}>{product.brand}</p>
-                <p className="font-mono text-[10px] tracking-wider" style={{ color: '#9ca3af' }}>{product.model_number}</p>
+                <p className="font-mono text-[10px] tracking-widest font-bold uppercase" style={{ color: RED }}>{product.brand}</p>
+                <p className="font-mono text-[10px] tracking-wider" style={{ color: COLORS.inkMuted }}>{product.model_number}</p>
               </div>
               {product.featured && (
-                <span className="ml-auto px-2.5 py-1 rounded-full text-[9px] font-mono font-bold tracking-wider flex-shrink-0"
-                  style={{ background: 'rgba(251,191,36,0.12)', color: '#f59e0b', border: '1px solid rgba(251,191,36,0.25)' }}>
+                <span
+                  className="ml-auto px-2.5 py-1 rounded-full text-[9px] font-mono font-bold tracking-wider flex-shrink-0"
+                  style={{ background: COLORS.redSoft, color: RED, border: `1px solid ${RED}` }}
+                >
                   ★ FEATURED
                 </span>
               )}
             </div>
 
-            <h1 className="font-black text-[#0d1117] mb-4 leading-tight" style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)' }}>
+            <h1 className="font-black mb-4 leading-tight" style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', color: COLORS.ink }}>
               {product.title}
             </h1>
 
             <div className="flex items-center gap-2 flex-wrap mb-6">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-mono font-bold"
+              <span
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-mono font-bold"
                 style={product.in_stock
-                  ? { background: 'rgba(0,196,154,0.1)', color: TEAL, border: '1px solid rgba(0,196,154,0.25)' }
-                  : { background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.25)' }}>
+                  ? { background: COLORS.redSoft, color: RED, border: `1px solid ${RED}` }
+                  : { background: 'rgba(239,68,68,0.1)', color: '#b91c1c', border: '1px solid rgba(239,68,68,0.25)' }}
+              >
                 {product.in_stock ? '● In Stock' : '○ Out of Stock'}
               </span>
               {product.category && (
-                <span className="px-3 py-1.5 rounded-lg text-[11px] font-mono" style={{ background: '#f0f4ff', color: '#6b7280' }}>
+                <span className="px-3 py-1.5 rounded-lg text-[11px] font-mono" style={{ background: COLORS.ash, color: COLORS.inkSoft }}>
                   {product.category}
                 </span>
               )}
+              <span
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-mono font-bold"
+                style={{ background: COLORS.white, color: COLORS.ink, border: `1px solid ${COLORS.ashLine}` }}
+              >
+                12-MONTH WARRANTY
+              </span>
             </div>
 
             {product.price && (
-              <div className="mb-6 pb-6" style={{ borderBottom: '1px solid #eef0f4' }}>
-                <p className="text-[9px] font-mono tracking-widest mb-1" style={{ color: '#9ca3af' }}>PRICE</p>
-                <p className="font-black" style={{ fontSize: '2.4rem', color: TEAL, lineHeight: 1 }}>
+              <div className="mb-6 pb-6" style={{ borderBottom: `1px solid ${COLORS.ashLine}` }}>
+                <p className="text-[9px] font-mono tracking-widest mb-1" style={{ color: COLORS.inkMuted }}>PRICE</p>
+                <p className="font-black" style={{ fontSize: '2.4rem', color: RED, lineHeight: 1 }}>
                   GH₵ {product.price.toLocaleString()}
                 </p>
               </div>
             )}
 
             {product.description && (
-              <p className="text-sm leading-relaxed mb-6" style={{ color: '#6b7280' }}>{product.description}</p>
+              <p className="text-sm leading-relaxed mb-6" style={{ color: COLORS.inkSoft }}>{product.description}</p>
             )}
 
             {specs && (
               <div className="grid grid-cols-2 gap-2 mb-7">
                 {Object.entries(specs).slice(0, 4).map(([k, v]) => (
-                  <div key={k} className="p-3 rounded-xl bg-white border border-gray-100">
-                    <p className="text-[8px] font-mono tracking-widest uppercase mb-0.5" style={{ color: '#9ca3af' }}>{k}</p>
-                    <p className="text-xs font-bold" style={{ color: '#1f2937' }}>{v}</p>
+                  <div key={k} className="p-3 rounded-xl" style={{ background: COLORS.white, border: `1px solid ${COLORS.ashLine}` }}>
+                    <p className="text-[8px] font-mono tracking-widest uppercase mb-0.5" style={{ color: COLORS.inkMuted }}>{k}</p>
+                    <p className="text-xs font-bold" style={{ color: COLORS.ink }}>{v}</p>
                   </div>
                 ))}
               </div>
             )}
 
             <div className="flex flex-col sm:flex-row gap-3 mt-auto">
-              <a href={waUrl} target="_blank" rel="noopener noreferrer"
+              <a
+                href={waUrl}
+                target="_blank" rel="noopener noreferrer"
                 className="flex-1 flex items-center justify-center gap-2.5 py-4 rounded-xl font-black text-sm tracking-widest text-white uppercase transition-all hover:opacity-90 active:scale-95"
-                style={{ background: '#25D366' }}>
+                style={{ background: '#25D366' }}
+              >
                 <IconWhatsApp size={17} /> Order on WhatsApp
               </a>
-              <a href="tel:+233555517658"
-                className="flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-black text-sm tracking-widest uppercase border-2 border-[#0d1117] text-[#0d1117] hover:bg-[#0d1117] hover:text-white transition-all duration-200">
+              <a
+                href={`tel:${COMPANY.phones.primary}`}
+                className="flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-black text-sm tracking-widest uppercase transition-all duration-200"
+                style={{ border: `2px solid ${COLORS.ink}`, color: COLORS.ink, background: COLORS.white }}
+              >
                 <IconPhone /> Call Us
               </a>
             </div>
 
-            <div className="flex flex-wrap gap-3 mt-4 p-4 rounded-xl"
-              style={{ background: 'rgba(0,196,154,0.05)', border: '1px solid rgba(0,196,154,0.12)' }}>
-              {['Free delivery in Ghana', 'Warranty included', 'Expert installation'].map(item => (
+            <div
+              className="flex flex-wrap gap-3 mt-4 p-4 rounded-xl"
+              style={{ background: COLORS.redSoft, border: `1px solid ${RED}40` }}
+            >
+              {['12-month warranty', 'Delivery available', 'Cash or Mobile Money'].map(item => (
                 <div key={item} className="flex items-center gap-1.5">
                   <span className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'rgba(0,196,154,0.15)' }}>
-                    <span style={{ color: TEAL, display: 'flex' }}><IconCheck /></span>
+                    style={{ background: RED }}>
+                    <span style={{ color: COLORS.white, display: 'flex' }}><IconCheck /></span>
                   </span>
-                  <span className="text-xs" style={{ color: '#4b5563' }}>{item}</span>
+                  <span className="text-xs" style={{ color: COLORS.ink }}>{item}</span>
                 </div>
               ))}
             </div>
@@ -213,14 +228,16 @@ export default async function ProductPage({
         </div>
 
         {specs && (
-          <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 mb-16"
-            style={{ boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}>
-            <h2 className="font-black text-[#0d1117] text-xl mb-6 tracking-tight">Full Specifications</h2>
+          <div
+            className="rounded-2xl p-6 sm:p-8 mb-16"
+            style={{ background: COLORS.white, border: `1px solid ${COLORS.ashLine}`, boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}
+          >
+            <h2 className="font-black text-xl mb-6 tracking-tight" style={{ color: COLORS.ink }}>Full Specifications</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {Object.entries(specs).map(([k, v]) => (
-                <div key={k} className="p-3 rounded-xl" style={{ background: '#f7f8fc' }}>
-                  <p className="text-[9px] font-mono tracking-widest uppercase mb-1" style={{ color: '#9ca3af' }}>{k}</p>
-                  <p className="text-sm font-bold" style={{ color: '#1f2937' }}>{v}</p>
+                <div key={k} className="p-3 rounded-xl" style={{ background: COLORS.ash }}>
+                  <p className="text-[9px] font-mono tracking-widest uppercase mb-1" style={{ color: COLORS.inkMuted }}>{k}</p>
+                  <p className="text-sm font-bold" style={{ color: COLORS.ink }}>{v}</p>
                 </div>
               ))}
             </div>
@@ -231,14 +248,16 @@ export default async function ProductPage({
           <div>
             <div className="flex items-end justify-between mb-8">
               <div>
-                <p className="font-mono text-[10px] tracking-[0.35em] uppercase mb-1.5" style={{ color: TEAL }}>
+                <p className="font-mono text-[10px] tracking-[0.35em] uppercase mb-1.5" style={{ color: RED }}>
                   More from {product.brand}
                 </p>
-                <h2 className="font-black text-[#0d1117] text-2xl tracking-tight">Related Products</h2>
+                <h2 className="font-black text-2xl tracking-tight" style={{ color: COLORS.ink }}>Related Products</h2>
               </div>
-              <Link href={`/products?brand=${product.brand}`}
+              <Link
+                href={`/products?brand=${encodeURIComponent(product.brand)}`}
                 className="flex items-center gap-1.5 text-xs font-bold tracking-widest uppercase transition-all hover:gap-2.5"
-                style={{ color: TEAL }}>
+                style={{ color: RED }}
+              >
                 View All <IconArrow />
               </Link>
             </div>
@@ -246,19 +265,22 @@ export default async function ProductPage({
               {related.map((p: any) => {
                 const rImgs = (p.images || []).filter(Boolean)
                 return (
-                  <Link key={p.id} href={`/products/${encodeURIComponent(p.brand)}/${p.id}`}
-                    className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:border-[#00c49a] hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
-                    style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                    <div className="relative overflow-hidden bg-gray-100" style={{ aspectRatio: '4/3' }}>
+                  <Link
+                    key={p.id}
+                    href={`/products/${encodeURIComponent(p.brand)}/${p.id}`}
+                    className="group rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                    style={{ background: COLORS.white, border: `1px solid ${COLORS.ashLine}`, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+                  >
+                    <div className="relative overflow-hidden" style={{ aspectRatio: '4/3', background: COLORS.ash }}>
                       {rImgs[0]
                         ? <Image src={rImgs[0]} alt={p.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="25vw" />
                         : <div className="flex items-center justify-center h-full text-4xl">📦</div>
                       }
                     </div>
                     <div className="p-3 sm:p-4">
-                      <p className="text-[9px] font-mono tracking-widest mb-1" style={{ color: '#9ca3af' }}>{p.model_number}</p>
-                      <h3 className="font-bold text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-[#00c49a] transition-colors" style={{ color: '#0d1117' }}>{p.title}</h3>
-                      {p.price && <p className="font-black text-base mt-2" style={{ color: TEAL }}>GH₵ {p.price.toLocaleString()}</p>}
+                      <p className="text-[9px] font-mono tracking-widest mb-1" style={{ color: COLORS.inkMuted }}>{p.model_number}</p>
+                      <h3 className="font-bold text-xs sm:text-sm line-clamp-2 leading-snug transition-colors" style={{ color: COLORS.ink }}>{p.title}</h3>
+                      {p.price && <p className="font-black text-base mt-2" style={{ color: RED }}>GH₵ {p.price.toLocaleString()}</p>}
                     </div>
                   </Link>
                 )
