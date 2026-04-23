@@ -6,19 +6,14 @@ import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import { BRANDS, type Product } from '@/types'
 import StockTab from '@/components/StockTab'
-import SalesDashboard from '@/components/admin/SalesDashboard'
-import InvoiceForm from '@/components/admin/InvoiceForm'
-import InvoiceList from '@/components/admin/InvoiceList'
-import ProductWatches, { useUnreadAlertCount } from '@/components/admin/ProductWatches'
-import { useRole, useIdleSignOut } from '@/lib/sales'
-import { COMPANY, COLORS, APPLIANCE_CATEGORIES, PARTNER_BRANDS } from '@/lib/brand'
+import { useIdleSignOut } from '@/lib/sales'
+import { COLORS, APPLIANCE_CATEGORIES, PARTNER_BRANDS } from '@/lib/brand'
 
 const RED = COLORS.red
 const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'intelet2026'
 
 // ── Inline SVGs ──────────────────────────────────────────────
 const IconPackage = () => (<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>)
-const IconBag    = () => (<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>)
 const IconStar   = ({ filled }: { filled?: boolean }) => (<svg width="14" height="14" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>)
 const IconEdit   = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>)
 const IconTrash  = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>)
@@ -198,9 +193,8 @@ export default function AdminPage() {
   const [signingIn,   setSigningIn]   = useState(false)
   // Default to light (Intelet ash/white) — user can still toggle dark.
   const [darkMode,    setDarkMode]    = useState(false)
-  const [tab,         setTab]         = useState<'products'|'orders'|'add'|'stock'|'sales'|'invoice'|'invoices'|'alerts'>('products')
+  const [tab,         setTab]         = useState<'products'|'add'|'stock'>('products')
   const [products,    setProducts]    = useState<Product[]>([])
-  const [orders,      setOrders]      = useState<any[]>([])
   const [loading,     setLoading]     = useState(false)
   const [editProduct, setEditProduct] = useState<Product|null>(null)
   const [search,      setSearch]      = useState('')
@@ -217,9 +211,7 @@ export default function AdminPage() {
   const [dragging,   setDragging]   = useState(false)
 
   const router = useRouter()
-  const { role, isBoss } = useRole()
   useIdleSignOut(30)
-  const unreadAlerts = useUnreadAlertCount(authed && isBoss)
 
   useEffect(() => {
     setAuthed(typeof window !== 'undefined' && localStorage.getItem('intelet-admin') === '1')
@@ -232,16 +224,12 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!authed) return
-    fetchProducts(); fetchOrders()
+    fetchProducts()
   }, [authed])
 
   const fetchProducts = async () => {
     const { data } = await supabase.from('products').select('*').order('created_at', { ascending:false })
     setProducts(data || [])
-  }
-  const fetchOrders = async () => {
-    const { data } = await supabase.from('orders').select('*, products(title,model_number)').order('created_at', { ascending:false })
-    setOrders(data || [])
   }
 
   const generateSlug = (title:string, model:string) =>
@@ -454,24 +442,6 @@ export default function AdminPage() {
               {darkMode ? 'Dark' : 'Light'}
             </button>
 
-            {isBoss && (
-              <button onClick={() => setTab('alerts')} title="Boss alerts"
-                style={{ position:'relative', background:'none', border:`1px solid ${theme.border}`, borderRadius:'10px', padding:'8px 12px', cursor:'pointer', color: theme.text, fontSize:'16px' }}>
-                🔔
-                {unreadAlerts > 0 && (
-                  <span style={{ position:'absolute', top:-6, right:-6, background:'#ef4444', color:'#fff', fontSize:10, fontWeight:900, padding:'2px 6px', borderRadius:10, minWidth:18, textAlign:'center' }}>
-                    {unreadAlerts > 99 ? '99+' : unreadAlerts}
-                  </span>
-                )}
-              </button>
-            )}
-
-            {role && (
-              <span style={{ fontSize:11, fontWeight:800, letterSpacing:'0.12em', padding:'6px 10px', borderRadius:8, background:'rgba(200,16,46,0.1)', color:RED }}>
-                {role.toUpperCase()}
-              </span>
-            )}
-
             <button onClick={() => { localStorage.removeItem('intelet-admin'); setAuthed(false); router.push('/admin/login') }}
               style={{ color:'#64748b', fontSize:'13px', background:'none', border:'none', cursor:'pointer' }}>
               Sign Out
@@ -483,7 +453,6 @@ export default function AdminPage() {
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:'12px', marginBottom:'28px' }}>
           {[
             { label:'Products',  value:products.length,                           icon:<IconPackage /> },
-            { label:'Orders',    value:orders.length,                             icon:<IconBag /> },
             { label:'In Stock',  value:products.filter(p=>p.in_stock).length,     icon:<span style={{fontSize:'20px'}}>✓</span> },
             { label:'Featured',  value:products.filter(p=>p.featured).length,     icon:<IconStar filled /> },
           ].map(s => (
@@ -508,30 +477,18 @@ export default function AdminPage() {
           borderRadius:'12px', padding:'4px', width:'fit-content', maxWidth:'100%', overflowX:'auto', marginBottom:'28px',
           transition:'all 0.35s ease',
         }}>
-          {(() => {
-            const all = ['sales','invoice','invoices','alerts','products','orders','add','stock'] as const
-            const visible = all.filter(t => {
-              // Cashier can only: create invoices + see their own invoice list
-              if (!isBoss && role === 'cashier') return t === 'invoice' || t === 'invoices'
-              // If role not loaded yet, show the old admin surface (fallback to password-based)
-              return true
-            })
-            const labelOf = (t: typeof all[number]) => {
-              if (t === 'add')      return editProduct ? 'EDIT PRODUCT' : '+ ADD PRODUCT'
-              if (t === 'stock')    return '📦 STOCK'
-              if (t === 'sales')    return '📊 SALES'
-              if (t === 'invoice')  return '+ NEW INVOICE'
-              if (t === 'invoices') return 'INVOICES'
-              if (t === 'alerts')   return `🔔 ALERTS${unreadAlerts ? ` (${unreadAlerts})` : ''}`
-              return t.toUpperCase()
-            }
-            return visible.map(t => (
+          {(['products','add','stock'] as const).map(t => {
+            const label =
+              t === 'add'   ? (editProduct ? 'EDIT PRODUCT' : '+ ADD PRODUCT') :
+              t === 'stock' ? '📦 STOCK' :
+              t.toUpperCase()
+            return (
               <button key={t} onClick={() => { setTab(t); if (t!=='add') { resetForm(); setEditProduct(null) } }}
                 style={{ padding:'10px 20px', borderRadius:'8px', fontWeight:700, fontSize:'12px', letterSpacing:'0.1em', border:'none', cursor:'pointer', transition:'all 0.15s', background: tab===t ? RED : 'transparent', color: tab===t ? '#ffffff' : '#64748b', position:'relative' }}>
-                {labelOf(t)}
+                {label}
               </button>
-            ))
-          })()}
+            )
+          })}
         </div>
 
         {/* Products tab */}
@@ -564,42 +521,6 @@ export default function AdminPage() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
-
-        {/* Orders tab */}
-        {tab === 'orders' && (
-          <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
-            {orders.length === 0 && <div style={{ textAlign:'center', padding:'64px 0', color:'#475569', fontFamily:'monospace' }}>No orders yet</div>}
-            {orders.map(order => (
-              <div key={order.id} style={{ padding:'24px', borderRadius:'14px', border:`1px solid ${theme.border}`, background: theme.cardBg, transition:'all 0.35s ease' }}>
-                <div style={{ display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:'12px', marginBottom:'12px' }}>
-                  <div>
-                    <div style={{ fontWeight:700, color: theme.text, fontSize:'15px' }}>{order.customer_name}</div>
-                    <div style={{ color:'#64748b', fontSize:'12px', fontFamily:'monospace' }}>{order.customer_phone} {order.customer_email && `· ${order.customer_email}`}</div>
-                  </div>
-                  <div style={{ textAlign:'right' }}>
-                    <div style={{ color:'#475569', fontSize:'11px', fontFamily:'monospace' }}>{new Date(order.created_at).toLocaleDateString()}</div>
-                    <div style={{ color:RED, fontFamily:'monospace', fontSize:'12px' }}>Qty: {order.quantity}</div>
-                  </div>
-                </div>
-                <div style={{ color:'#94a3b8', fontSize:'13px', marginBottom:'12px' }}>
-                  <strong style={{ color:'#64748b' }}>Product: </strong>{order.products?.title} — {order.products?.model_number}
-                </div>
-                <div style={{ display:'flex', gap:'6px', flexWrap:'wrap' }}>
-                  {(['pending','confirmed','delivered','cancelled'] as const).map(status => (
-                    <button key={status} onClick={async () => { await supabase.from('orders').update({ status }).eq('id',order.id); fetchOrders(); show(`Marked ${status}`) }}
-                      style={{ padding:'6px 14px', borderRadius:'8px', fontSize:'11px', fontWeight:700, letterSpacing:'0.08em', border:'none', cursor:'pointer', transition:'all 0.15s',
-                        background: order.status===status ? RED : 'rgba(200,16,46,0.08)',
-                        color: order.status===status ? '#ffffff' : '#64748b',
-                        outline: order.status===status ? 'none' : '1px solid rgba(200,16,46,0.2)',
-                      }}>
-                      {status.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
           </div>
         )}
 
@@ -710,30 +631,6 @@ export default function AdminPage() {
               </div>
             </div>
           </form>
-        )}
-
-        {/* Sales dashboard (boss/admin only) */}
-        {tab === 'sales' && (
-          isBoss
-            ? <SalesDashboard isBoss={isBoss} />
-            : <div style={{ padding:48, textAlign:'center', color:'#64748b' }}>Boss/Admin role required.</div>
-        )}
-
-        {/* New invoice (all authenticated users) */}
-        {tab === 'invoice' && (
-          <InvoiceForm onSaved={() => show('Invoice saved and downloaded')} />
-        )}
-
-        {/* Invoice list */}
-        {tab === 'invoices' && (
-          <InvoiceList />
-        )}
-
-        {/* Product watch alerts (boss/admin only) */}
-        {tab === 'alerts' && (
-          isBoss
-            ? <ProductWatches />
-            : <div style={{ padding:48, textAlign:'center', color:'#64748b' }}>Boss/Admin role required.</div>
         )}
 
         {/* Stock tab */}
