@@ -72,10 +72,10 @@ export const PARTNER_BRANDS: PartnerBrand[] = [
   { name: 'Bruhm',    slug: 'bruhm',    logo: '/bruhm_brand.jpg' },
   { name: 'Tamashi',  slug: 'tamashi',  logo: '/TAMASHI.jpg' },
   { name: 'NASCO',    slug: 'nasco',    logo: '/nasco.png' },
-  { name: 'Philips',  slug: 'philips',  logo: '/Phillips.png' },
-  { name: 'Haier',    slug: 'haier',    logo: '/haeir.jpg' },
+  { name: 'Philips',  slug: 'philips',  logo: '/philips.svg' },
+  { name: 'Haier',    slug: 'haier',    logo: '/haier.svg' },
   { name: 'Panasonic',slug: 'panasonic',logo: '/panasonic.svg' },
-  { name: 'Beko',     slug: 'beko',     logo: '/beko.jpg' },
+  { name: 'Beko',     slug: 'beko',     logo: '/beko.svg' },
 ]
 
 // ── Appliance categories ────────────────────────────────────
