@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: `About ${COMPANY.name}`,
-    description: `Ghana's home of quality home appliances. Grand Opening ${COMPANY.grandOpening.label} at ${COMPANY.address.line1}.`,
+    description: `Ghana's home of quality home appliances. Visit our showroom at ${COMPANY.address.line1}, next to MTN on the N1 Highway.`,
     url: `${COMPANY.baseUrl}/about`,
     images: [{ url: '/preview.jpg', width: 1200, height: 630 }],
   },
@@ -30,7 +30,7 @@ const values = [
   { icon: Award,          title: 'Authorised Dealer',  desc: 'Official partner for Samsung, Midea, Bruhm, Tamashi, TCL, NASCO and Haier.' },
   { icon: Truck,          title: 'Delivery Available', desc: 'Doorstep delivery across Accra and the regions — ask for a quote.' },
   { icon: HeadphonesIcon, title: 'Real Support',       desc: 'A walk-in showroom, WhatsApp and phone lines staffed by real people.' },
-  { icon: Clock,          title: 'Grand Opening Prices', desc: `Save up to 40% during the Grand Opening, ${COMPANY.grandOpening.label}.` },
+  { icon: Clock,          title: 'Competitive Prices',   desc: 'We price every appliance fairly so you always get real value for your money.' },
   { icon: Users,          title: 'Trusted Locally',    desc: 'Proudly based in Lapaz-Akweteyman, serving Ghanaian homes and businesses.' },
 ]
 
@@ -79,10 +79,7 @@ export default function AboutPage() {
             <p className="leading-relaxed mb-4" style={{ color: COLORS.inkSoft }}>
               Our showroom is at <strong style={{ color: COLORS.ink }}>{COMPANY.address.line1}</strong>,
               next to MTN on the N1 Highway. Walk in to see the appliances in person, compare models, and
-              lock in your Grand Opening price with cash or Mobile Money.
-            </p>
-            <p className="text-sm font-mono tracking-widest" style={{ color: RED }}>
-              {COMPANY.grandOpening.headline} · {COMPANY.grandOpening.label}
+              Pay with cash or Mobile Money.
             </p>
           </div>
         </div>

@@ -10,17 +10,17 @@ export const metadata: Metadata = {
   metadataBase: new URL(BASE),
 
   title: {
-    default: `${COMPANY.name} | Home Appliances Ghana — Grand Opening 24–27 April 2026`,
+    default: `${COMPANY.name} | Home Appliances Ghana`,
     template: `%s | ${COMPANY.name} Ghana`,
   },
-  description: `${COMPANY.name} is Ghana's trusted home-appliance retailer — Samsung, Midea, Bruhm, Tamashi, TCL, NASCO and Haier fridges, freezers, washing machines, ACs and TVs. Grand Opening promo 24–27 April 2026 at Lapaz-Akweteyman, next to MTN on the N1 Highway.`,
+  description: `${COMPANY.name} is Ghana's trusted home-appliance retailer — Samsung, Midea, Bruhm, Tamashi, TCL, NASCO and Haier fridges, freezers, washing machines, ACs and TVs. Showroom at Lapaz-Akweteyman, next to MTN on the N1 Highway.`,
   keywords: [
     'home appliances Ghana', 'fridges Ghana', 'washing machines Accra',
     'air conditioners Ghana', 'chest freezer Ghana', 'televisions Accra',
     'Samsung Ghana', 'Midea Ghana', 'Bruhm Ghana', 'Tamashi Ghana',
     'TCL Ghana', 'NASCO Ghana', 'Haier Ghana',
     'Intelet Enterprise', 'Intelet Ghana', 'Lapaz Akweteyman appliances',
-    'Grand Opening appliances Ghana', 'appliance discounts Ghana',
+    'appliance discounts Ghana',
   ],
 
   authors: [{ name: COMPANY.name, url: BASE }],
@@ -38,15 +38,15 @@ export const metadata: Metadata = {
     locale: 'en_GH',
     url: BASE,
     siteName: COMPANY.name,
-    title: `${COMPANY.name} | Grand Opening 24–27 April 2026`,
-    description: `Ghana's home of quality appliances. Samsung, Midea, Bruhm, Tamashi, TCL, NASCO, Haier — with Grand Opening DISCOUNTS at Lapaz-Akweteyman.`,
-    images: [{ url: '/preview.jpg', width: 1200, height: 630, alt: `${COMPANY.name} — Grand Opening` }],
+    title: `${COMPANY.name} | Home Appliances Ghana`,
+    description: `Ghana's home of quality appliances. Samsung, Midea, Bruhm, Tamashi, TCL, NASCO, Haier — best prices at Lapaz-Akweteyman, Accra.`,
+    images: [{ url: '/preview.jpg', width: 1200, height: 630, alt: `${COMPANY.name} — Home Appliances Ghana` }],
   },
 
   twitter: {
     card: 'summary_large_image',
     title: `${COMPANY.name} | Home Appliances Ghana`,
-    description: `Grand Opening DISCOUNTS 24–27 April 2026 — fridges, freezers, washers, ACs and TVs from the brands you trust.`,
+    description: `Fridges, freezers, washers, ACs and TVs from the brands you trust — best prices in Accra with a 12-month warranty.`,
     images: ['/preview.jpg'],
   },
 
@@ -102,17 +102,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             currenciesAccepted: 'GHS',
             paymentAccepted: 'Cash, Mobile Money',
             areaServed: { '@type': 'Country', name: 'Ghana' },
-            event: {
-              '@type': 'SaleEvent',
-              name: 'Intelet Grand Opening DISCOUNTS',
-              startDate: COMPANY.grandOpening.startDate,
-              endDate: COMPANY.grandOpening.endDate,
-              location: {
-                '@type': 'Place',
-                name: COMPANY.name,
-                address: COMPANY.address.full,
-              },
-            },
           })}}
         />
         <div className="" />

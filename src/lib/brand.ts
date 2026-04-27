@@ -7,12 +7,6 @@ export const COMPANY = {
   name: 'Intelet Enterprise',
   short: 'INTELET',
   tagline: "Ghana's Home of Quality Appliances",
-  grandOpening: {
-    startDate: '2026-04-24',
-    endDate:   '2026-04-27',
-    label:     '24 – 27 APRIL 2026',
-    headline:  'GRAND OPENING',
-  },
   address: {
     line1:   'Lapaz-Akweteyman',
     line2:   'Next to MTN on the N1 Highway',
@@ -80,7 +74,7 @@ export const PARTNER_BRANDS: PartnerBrand[] = [
   { name: 'NASCO',    slug: 'nasco',    logo: '/nasco.png' },
   { name: 'Philips',  slug: 'philips',  logo: '/Phillips.png' },
   { name: 'Haier',    slug: 'haier',    logo: '/haeir.jpg' },
-  { name: 'Panasonic',slug: 'panasonic',logo: '/panasonic.jpg' },
+  { name: 'Panasonic',slug: 'panasonic',logo: '/panasonic.svg' },
   { name: 'Beko',     slug: 'beko',     logo: '/beko.jpg' },
 ]
 

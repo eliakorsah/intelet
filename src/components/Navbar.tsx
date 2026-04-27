@@ -85,7 +85,6 @@ const Placeholder = ({ name }: { name: string }) => (
 const NAV_LINKS = [
   { label: 'HOME',     href: '/' },
   { label: 'PRODUCTS', href: '/products' },
-  { label: 'GRAND OPENING', href: '/#grand-opening' },
   { label: 'ABOUT',    href: '/about' },
   { label: 'CONTACT',  href: '/contact' },
 ]
@@ -161,7 +160,7 @@ export default function Navbar() {
             ))}
           </div>
           <span className="font-mono text-[10px] tracking-[0.25em] uppercase font-bold" style={{ color: RED }}>
-            GRAND OPENING &nbsp;·&nbsp; {COMPANY.grandOpening.label} &nbsp;·&nbsp; {COMPANY.address.line1.toUpperCase()}
+            {COMPANY.address.line1.toUpperCase()} &nbsp;·&nbsp; NEXT TO MTN ON THE N1 HIGHWAY
           </span>
         </div>
       </div>

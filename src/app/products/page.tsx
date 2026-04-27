@@ -4,16 +4,16 @@ import { COMPANY } from '@/lib/brand'
 
 export const metadata: Metadata = {
   title: 'Products',
-  description: `Browse genuine home appliances at ${COMPANY.name} — fridges, chest freezers, washing machines, air conditioners and televisions from Samsung, Midea, Bruhm, Tamashi, TCL, NASCO and Haier. Grand Opening DISCOUNTS ${COMPANY.grandOpening.label}.`,
+  description: `Browse genuine home appliances at ${COMPANY.name} — fridges, chest freezers, washing machines, air conditioners and televisions from Samsung, Midea, Bruhm, Tamashi, TCL, NASCO and Haier. Best prices in Accra with a 12-month warranty.`,
   keywords: [
     'buy fridge Ghana', 'chest freezer Ghana', 'washing machine Ghana', 'air conditioner Ghana',
     'television Accra', 'Samsung fridge Ghana', 'Midea AC Ghana', 'Bruhm freezer Ghana',
     'Tamashi washing machine Ghana', 'TCL TV Ghana', 'NASCO appliances Ghana', 'Haier Ghana',
-    'Grand Opening discounts Ghana',
+    'appliance discounts Ghana',
   ],
   openGraph: {
     title: `Home Appliances | ${COMPANY.name} Ghana`,
-    description: `Fridges, freezers, washers, ACs and TVs — genuine brands with a 12-month warranty. Grand Opening ${COMPANY.grandOpening.label}.`,
+    description: `Fridges, freezers, washers, ACs and TVs — genuine brands with a 12-month warranty. Best prices at Lapaz-Akweteyman, Accra.`,
     url: `${COMPANY.baseUrl}/products`,
     images: [{ url: '/preview.jpg', width: 1200, height: 630 }],
   },

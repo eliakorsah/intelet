@@ -6,7 +6,7 @@ import { COMPANY, COLORS, PARTNER_BRANDS, APPLIANCE_CATEGORIES, whatsappLink } f
 export default function Footer() {
   return (
     <footer style={{ background: COLORS.ink, borderTop: `1px solid ${COLORS.red}` }}>
-      {/* CTA Banner — Grand Opening */}
+      {/* CTA Banner */}
       <div
         className="py-12"
         style={{
@@ -18,11 +18,11 @@ export default function Footer() {
             <ShieldCheck size={14} /> 12-MONTH WARRANTY ON ALL APPLIANCES
           </div>
           <h2 className="font-heading font-700 text-3xl md:text-4xl text-white mb-3">
-            GRAND OPENING <span className="underline decoration-white/40 decoration-4 underline-offset-4">DISCOUNTS</span>
+            UNBEATABLE PRICES ON <span className="underline decoration-white/40 decoration-4 underline-offset-4">QUALITY APPLIANCES</span>
           </h2>
           <p className="text-white/80 mb-6 max-w-xl mx-auto">
-            {COMPANY.grandOpening.label} at {COMPANY.address.line1}, next to MTN on the N1 Highway.
-            Unbeatable prices on fridges, freezers, washing machines, ACs and TVs.
+            Visit us at {COMPANY.address.line1}, next to MTN on the N1 Highway.
+            Genuine fridges, freezers, washing machines, ACs and TVs — all with a 12-month warranty.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
@@ -171,7 +171,7 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-2 text-xs font-mono text-slate-500">
             <span className="w-2 h-2 rounded-full bg-[#C8102E] animate-pulse" />
-            OPEN {COMPANY.grandOpening.label}
+            NOW OPEN · {COMPANY.address.line1}
           </div>
         </div>
       </div>

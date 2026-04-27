@@ -16,6 +16,8 @@ export default function BrandsTicker() {
         borderBottom: `1px solid ${COLORS.ashLine}`,
         overflow: 'hidden',
         position: 'relative',
+        WebkitTransform: 'translateZ(0)',
+        transform: 'translateZ(0)',
       }}
     >
       {/* Fade edges */}
@@ -31,6 +33,10 @@ export default function BrandsTicker() {
       }} />
 
       <style>{`
+        @-webkit-keyframes brandScroll {
+          0%   { -webkit-transform: translateX(0); transform: translateX(0); }
+          100% { -webkit-transform: translateX(-50%); transform: translateX(-50%); }
+        }
         @keyframes brandScroll {
           0%   { transform: translateX(0); }
           100% { transform: translateX(-50%); }
@@ -40,16 +46,21 @@ export default function BrandsTicker() {
           align-items: center;
           width: max-content;
           will-change: transform;
+          -webkit-animation: brandScroll 40s linear infinite;
           animation: brandScroll 40s linear infinite;
+          -webkit-transform: translateZ(0);
+          transform: translateZ(0);
+          touch-action: pan-y;
         }
         @media (hover: hover) {
           .brands-track:hover {
+            -webkit-animation-play-state: paused;
             animation-play-state: paused;
           }
         }
       `}</style>
 
-      <div className="brands-track">
+      <div className="brands-track" style={{ touchAction: 'pan-y' }}>
         {items.map((brand, i) => (
           <Link
             key={i}

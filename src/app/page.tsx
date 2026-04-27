@@ -37,7 +37,7 @@ const IconCheck = () => (
 
 const perks = [
   'Authorised dealer for Samsung, Midea, Bruhm, Tamashi, TCL, NASCO & Haier',
-  'Grand Opening DISCOUNTS — save up to 40% off retail',
+  'Best prices in Accra — genuine appliances at fair prices',
   '12-month manufacturer warranty on every appliance',
   'Cash or Mobile Money accepted — flexible payment',
   'Doorstep delivery available across Accra and beyond',
@@ -95,14 +95,14 @@ export default async function HomePage() {
             <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 gap-4">
               <div>
                 <p className="font-mono text-[11px] tracking-[0.35em] uppercase mb-3" style={{ color: RED }}>
-                  {COMPANY.grandOpening.headline} · {COMPANY.grandOpening.label}
+                  FEATURED DEALS
                 </p>
                 <h2 className="font-heading font-black tracking-tight leading-[1.05]"
                   style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', color: COLORS.ink }}>
                   Promo <span style={{ color: RED }}>DISCOUNTS</span> on<br />Featured Appliances
                 </h2>
                 <p className="mt-4 text-sm leading-relaxed max-w-lg" style={{ color: COLORS.inkSoft }}>
-                  Handpicked deals for our Grand Opening week. Walk into our showroom at{' '}
+                  Handpicked deals at unbeatable prices. Walk into our showroom at{' '}
                   {COMPANY.address.line1}, next to MTN on the N1 Highway, or message us on WhatsApp.
                 </p>
               </div>
@@ -409,7 +409,7 @@ export default async function HomePage() {
               style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)' }}>
               <span className="flex" style={{ color: COLORS.white }}><IconShield size={12} /></span>
               <span className="font-mono text-[10px] tracking-[0.3em] uppercase" style={{ color: COLORS.white }}>
-                Grand Opening · {COMPANY.grandOpening.label}
+                NOW OPEN · {COMPANY.address.line1}
               </span>
             </div>
             <h2 className="font-heading font-black text-white leading-tight tracking-tight mb-5"
@@ -417,8 +417,7 @@ export default async function HomePage() {
               Visit our showroom<br />at {COMPANY.address.line1}
             </h2>
             <p className="max-w-lg mx-auto mb-10 leading-relaxed text-sm" style={{ color: 'rgba(255,255,255,0.85)' }}>
-              {COMPANY.address.line2}, {COMPANY.address.city}. Walk in, WhatsApp us, or call to reserve your
-              appliance at a Grand Opening price.
+              {COMPANY.address.line2}, {COMPANY.address.city}. Walk in, WhatsApp us, or call to get the best price on your next appliance.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href={whatsappLink()}

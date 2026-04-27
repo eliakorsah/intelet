@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: `Contact ${COMPANY.name}`,
-    description: `Reach us by phone, WhatsApp, or visit the showroom at ${COMPANY.address.line1} — Grand Opening ${COMPANY.grandOpening.label}.`,
+    description: `Reach us by phone, WhatsApp, or visit the showroom at ${COMPANY.address.line1} — next to MTN on the N1 Highway, ${COMPANY.address.city}.`,
     url: `${COMPANY.baseUrl}/contact`,
     images: [{ url: '/preview.jpg', width: 1200, height: 630 }],
   },

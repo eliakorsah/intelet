@@ -110,21 +110,6 @@ export default function HeroSection() {
             {/* ── LEFT: Text ── */}
             <div style={{ animation: 'fadeRightSpring 0.8s cubic-bezier(0.22,1,0.36,1) 0.05s both' }}>
 
-              {/* Grand Opening badge */}
-              <div
-                className="inline-flex items-center gap-2 mb-6 px-5 py-2 rounded-full"
-                style={{
-                  background: RED, color: COLORS.white,
-                  boxShadow: `0 10px 30px -10px ${RED}`,
-                  animation: 'heroBadge 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s both',
-                }}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                <span className="font-mono text-xs tracking-widest">
-                  {COMPANY.grandOpening.headline} · {COMPANY.grandOpening.label}
-                </span>
-              </div>
-
               {/* Headline */}
               <h1
                 className="font-heading font-black leading-[0.95] mb-5"
@@ -167,7 +152,7 @@ export default function HeroSection() {
               {/* Pills */}
               <div className="flex flex-wrap gap-3 mb-10">
                 {[
-                  { icon: <IconTag />,    label: 'Grand Opening Prices' },
+                  { icon: <IconTag />,    label: 'Best Prices in Accra' },
                   { icon: <IconShield />, label: '12-Month Warranty' },
                   { icon: <IconTruck />,  label: 'Delivery Available' },
                 ].map(({ icon, label }, i) => (
@@ -298,7 +283,7 @@ export default function HeroSection() {
                 >
                   <div>
                     <div className="text-[10px] font-mono tracking-[0.18em]" style={{ color: COLORS.inkMuted }}>
-                      GRAND OPENING FEATURED
+                      FEATURED APPLIANCES
                     </div>
                     <div className="text-sm font-heading font-bold" style={{ color: COLORS.ink }}>
                       {slides[current]?.label}

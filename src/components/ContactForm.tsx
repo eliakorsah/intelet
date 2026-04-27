@@ -44,15 +44,6 @@ export default function ContactForm() {
             Reach us on WhatsApp, phone, or walk into our showroom at{' '}
             <strong style={{ color: COLORS.ink }}>{COMPANY.address.line1}</strong>, next to MTN on the N1 Highway.
           </p>
-          <div
-            className="inline-flex items-center gap-2 mt-4 px-4 py-1.5 rounded-full"
-            style={{ background: RED, color: COLORS.white }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-            <span className="font-mono text-[11px] tracking-widest">
-              {COMPANY.grandOpening.headline} · {COMPANY.grandOpening.label}
-            </span>
-          </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
