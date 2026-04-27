@@ -39,10 +39,13 @@ export default function BrandsTicker() {
           display: flex;
           align-items: center;
           width: max-content;
-          animation: brandScroll 32s linear infinite;
+          will-change: transform;
+          animation: brandScroll 40s linear infinite;
         }
-        .brands-track:hover {
-          animation-play-state: paused;
+        @media (hover: hover) {
+          .brands-track:hover {
+            animation-play-state: paused;
+          }
         }
       `}</style>
 
