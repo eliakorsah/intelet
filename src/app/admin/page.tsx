@@ -193,7 +193,7 @@ export default function AdminPage() {
   const [signingIn,   setSigningIn]   = useState(false)
   // Default to light (Intelet ash/white) — user can still toggle dark.
   const [darkMode,    setDarkMode]    = useState(false)
-  const [tab,         setTab]         = useState<'products'|'add'|'stock'>('products')
+  const [tab,         setTab]         = useState<'products'|'add'|'stock'|'hero'>('products')
   const [products,    setProducts]    = useState<Product[]>([])
   const [loading,     setLoading]     = useState(false)
   const [editProduct, setEditProduct] = useState<Product|null>(null)
@@ -210,6 +210,10 @@ export default function AdminPage() {
   const [existingImgs, setExistingImgs] = useState<string[]>([])
   const [dragging,   setDragging]   = useState(false)
 
+  // Hero images (home page banner)
+  const [heroImages, setHeroImages] = useState<{ id: string; url: string; sort_order: number }[]>([])
+  const [heroBusy,   setHeroBusy]   = useState(false)
+
   const router = useRouter()
   useIdleSignOut(30)
 
@@ -225,11 +229,48 @@ export default function AdminPage() {
   useEffect(() => {
     if (!authed) return
     fetchProducts()
+    fetchHeroImages()
   }, [authed])
 
   const fetchProducts = async () => {
     const { data } = await supabase.from('products').select('*').order('created_at', { ascending:false })
     setProducts(data || [])
+  }
+
+  const fetchHeroImages = async () => {
+    const { data } = await supabase.from('hero_images').select('*').order('sort_order', { ascending: true })
+    setHeroImages(data || [])
+  }
+
+  // Upload one or more hero images to storage and register them in hero_images.
+  const addHeroImages = async (files: File[]) => {
+    if (!files.length) return
+    setHeroBusy(true)
+    try {
+      let order = heroImages.length
+      for (const file of files) {
+        const ext  = file.name.split('.').pop()
+        const name = `hero/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+        const { data, error } = await supabase.storage.from('product-images')
+          .upload(name, file, { cacheControl: '31536000', upsert: false })
+        if (error) { show(`Upload failed: ${error.message}`, 'err'); continue }
+        const { data: u } = supabase.storage.from('product-images').getPublicUrl(data.path)
+        const { error: insErr } = await supabase.from('hero_images').insert({ url: u.publicUrl, sort_order: order++ })
+        if (insErr) { show(`Save failed: ${insErr.message}`, 'err'); continue }
+      }
+      await fetchHeroImages()
+      show('Hero image(s) added!')
+    } catch (err: any) {
+      show(err.message || 'Error adding hero image', 'err')
+    } finally { setHeroBusy(false) }
+  }
+
+  const removeHeroImage = async (id: string) => {
+    if (!confirm('Remove this hero image?')) return
+    const { error } = await supabase.from('hero_images').delete().eq('id', id)
+    if (error) return show(error.message, 'err')
+    await fetchHeroImages()
+    show('Hero image removed')
   }
 
   const generateSlug = (title:string, model:string) =>
@@ -477,10 +518,11 @@ export default function AdminPage() {
           borderRadius:'12px', padding:'4px', width:'fit-content', maxWidth:'100%', overflowX:'auto', marginBottom:'28px',
           transition:'all 0.35s ease',
         }}>
-          {(['products','add','stock'] as const).map(t => {
+          {(['products','add','stock','hero'] as const).map(t => {
             const label =
               t === 'add'   ? (editProduct ? 'EDIT PRODUCT' : '+ ADD PRODUCT') :
               t === 'stock' ? '📦 STOCK' :
+              t === 'hero'  ? '🖼 HERO' :
               t.toUpperCase()
             return (
               <button key={t} onClick={() => { setTab(t); if (t!=='add') { resetForm(); setEditProduct(null) } }}
@@ -636,6 +678,46 @@ export default function AdminPage() {
         {/* Stock tab */}
         {tab === 'stock' && (
           <StockTab darkMode={darkMode} onToggleDark={() => setDarkMode(d => !d)} />
+        )}
+
+        {/* Hero tab — manage home page banner images */}
+        {tab === 'hero' && (
+          <div style={{ maxWidth:'760px' }}>
+            <p style={{ color: theme.sub, fontSize:'13px', marginBottom:'18px' }}>
+              These images show in the rotating banner at the top of the home page. Add as many as you like —
+              if none are set, the bundled <code>hero.png</code> is used.
+            </p>
+
+            <div
+              onClick={() => document.getElementById('hero-upload')?.click()}
+              style={{ border:`2px dashed rgba(200,16,46,0.25)`, borderRadius:'14px', padding:'32px', textAlign:'center', cursor: heroBusy?'wait':'pointer', background:'transparent', marginBottom:'20px', opacity: heroBusy?0.6:1 }}
+            >
+              <div style={{ color:'#334155', marginBottom:'8px', display:'flex', justifyContent:'center' }}><IconUpload /></div>
+              <p style={{ color:'#64748b', fontSize:'13px', marginBottom:'4px' }}>{heroBusy ? 'Uploading…' : 'Click to add hero image(s)'}</p>
+              <p style={{ color:'#334155', fontSize:'11px', fontFamily:'monospace' }}>PNG, JPG, WEBP · wide banner images work best</p>
+              <input type="file" accept="image/*" multiple id="hero-upload" style={{ display:'none' }}
+                onChange={e => { const arr = Array.from(e.target.files||[]); addHeroImages(arr); (e.target as HTMLInputElement).value = '' }} />
+            </div>
+
+            {heroImages.length === 0 ? (
+              <p style={{ color: theme.muted, fontSize:'13px', fontFamily:'monospace' }}>No custom hero images — using hero.png.</p>
+            ) : (
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))', gap:'12px' }}>
+                {heroImages.map((h, i) => (
+                  <div key={h.id} style={{ position:'relative', borderRadius:'12px', overflow:'hidden', border:`1px solid ${theme.border}`, background: theme.cardBg }}>
+                    <div style={{ position:'relative', width:'100%', aspectRatio:'4/3', background: darkMode ? '#14192a' : COLORS.ash }}>
+                      <Image src={h.url} alt={`Hero ${i+1}`} fill className="object-contain p-2" sizes="220px" />
+                    </div>
+                    <button type="button" onClick={() => removeHeroImage(h.id)}
+                      style={{ position:'absolute', top:'8px', right:'8px', background:'rgba(0,0,0,0.65)', border:'none', borderRadius:'50%', width:'26px', height:'26px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff' }}>
+                      <IconTrash />
+                    </button>
+                    <div style={{ padding:'8px 10px', fontSize:'10px', fontFamily:'monospace', color: theme.muted }}>#{i+1}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
 
       </div>

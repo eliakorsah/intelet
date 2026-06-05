@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import ProductCard from '@/components/ProductCard'
-import CategorySidebar from '@/components/CategorySidebar'
 import { supabase } from '@/lib/supabase'
 import { COLORS, PARTNER_BRANDS, APPLIANCE_CATEGORIES } from '@/lib/brand'
 
@@ -32,6 +31,32 @@ function getSlugsToMatch(slug: string): string[] {
   return [slug]
 }
 
+// Build a predicate for a sidebar `category_id` param. Handles three shapes:
+//   • plain appliance category   → "refrigerators"
+//   • partner brand              → "midea"
+//   • brand + category combo     → "midea-refrigerators"
+// Products store the brand in `brand` and a plain category slug in `category_id`.
+function categoryMatcher(param: string): (p: any) => boolean {
+  const cat = APPLIANCE_CATEGORIES.find(c => c.slug === param)
+  if (cat) {
+    const slugs = getSlugsToMatch(cat.slug)
+    return p => !!p.category_id && slugs.includes(p.category_id)
+  }
+
+  const brand = PARTNER_BRANDS.find(b => b.slug === param)
+  if (brand) return p => p.brand === brand.name
+
+  const brandPart = PARTNER_BRANDS.find(b => param.startsWith(`${b.slug}-`))
+  if (brandPart) {
+    const catSlug = param.slice(brandPart.slug.length + 1)
+    const c = APPLIANCE_CATEGORIES.find(x => x.slug === catSlug)
+    const slugs = c ? getSlugsToMatch(c.slug) : [catSlug]
+    return p => p.brand === brandPart.name && !!p.category_id && slugs.includes(p.category_id)
+  }
+
+  return p => p.category_id === param
+}
+
 const IconSearch = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -42,12 +67,6 @@ const IconX = () => (
     <path d="M18 6 6 18M6 6l12 12"/>
   </svg>
 )
-const IconFilter = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-  </svg>
-)
-
 function ProductsContent() {
   const searchParams = useSearchParams()
   const router       = useRouter()
@@ -58,7 +77,6 @@ function ProductsContent() {
   const [search,      setSearch]      = useState(searchParams.get('search') || '')
   const [brand,       setBrand]       = useState(searchParams.get('brand') || '')
   const [inStockOnly, setInStockOnly] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const categoryId = searchParams.get('category_id') || searchParams.get('category') || ''
 
@@ -92,8 +110,7 @@ function ProductsContent() {
     }
 
     if (categoryId) {
-      const slugsToMatch = getSlugsToMatch(categoryId)
-      r = r.filter(p => p.category_id && slugsToMatch.includes(p.category_id))
+      r = r.filter(categoryMatcher(categoryId))
     }
 
     if (inStockOnly) r = r.filter(p => p.in_stock)
@@ -111,6 +128,16 @@ function ProductsContent() {
 
   const hasFilters = search || brand || categoryId || inStockOnly
 
+  // Default landing (no search/brand/category) → group by category with a
+  // small preview each, instead of one giant scroll of every product.
+  const PREVIEW = 8
+  const showGrouped = !search && !brand && !categoryId
+  const groupSource = inStockOnly ? products.filter(p => p.in_stock) : products
+  const categoryGroups = APPLIANCE_CATEGORIES.map(cat => {
+    const slugs = getSlugsToMatch(cat.slug)
+    return { cat, items: groupSource.filter(p => p.category_id && slugs.includes(p.category_id)) }
+  }).filter(g => g.items.length > 0)
+
   const pageTitle = (() => {
     if (brand) return `${brand} Appliances`
     if (categoryId) {
@@ -118,6 +145,11 @@ function ProductsContent() {
       if (cat) return cat.name
       const b = PARTNER_BRANDS.find(b => b.slug === categoryId)
       if (b) return `${b.name} Appliances`
+      const bp = PARTNER_BRANDS.find(b => categoryId.startsWith(`${b.slug}-`))
+      if (bp) {
+        const c = APPLIANCE_CATEGORIES.find(x => x.slug === categoryId.slice(bp.slug.length + 1))
+        return c ? `${bp.name} ${c.name}` : `${bp.name} Appliances`
+      }
       return 'Appliances'
     }
     return 'All Appliances'
@@ -128,7 +160,7 @@ function ProductsContent() {
 
       {/* Header */}
       <div style={{ background: COLORS.white, borderBottom: `1px solid ${COLORS.ashLine}` }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-8">
           <p className="font-mono text-[10px] tracking-[0.35em] uppercase mb-1" style={{ color: RED }}>
             Our Catalogue
           </p>
@@ -141,7 +173,7 @@ function ProductsContent() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6">
 
         {/* Top filter bar */}
         <div className="flex flex-wrap gap-2 mb-5">
@@ -172,18 +204,6 @@ function ProductsContent() {
             In Stock
           </button>
 
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase"
-            style={{
-              background: COLORS.white,
-              border: `1px solid ${COLORS.ashLine}`,
-              color: sidebarOpen ? RED : COLORS.inkSoft,
-            }}
-          >
-            <IconFilter /> Categories
-          </button>
-
           {hasFilters && (
             <button
               onClick={clearAll}
@@ -193,6 +213,38 @@ function ProductsContent() {
               <IconX /> Clear All
             </button>
           )}
+        </div>
+
+        {/* Category quick-filters — horizontal scroll */}
+        <div className="-mx-4 sm:-mx-6 px-4 sm:px-6 mb-4 overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div className="flex gap-2 w-max pb-1">
+            {[{ label: 'All', slug: '' },
+              ...APPLIANCE_CATEGORIES.map(c => ({ label: c.name, slug: c.slug })),
+              ...PARTNER_BRANDS.map(b => ({ label: b.name, slug: b.slug }))
+            ].map(chip => {
+              const active = chip.slug
+                ? (categoryId === chip.slug || (!!brand && brand.toLowerCase() === chip.slug))
+                : (!categoryId && !brand)
+              return (
+                <button
+                  key={chip.slug || 'all'}
+                  onClick={() => {
+                    const p = new URLSearchParams(searchParams.toString())
+                    p.delete('brand'); p.delete('category')
+                    if (chip.slug) p.set('category_id', chip.slug); else p.delete('category_id')
+                    setBrand('')
+                    router.push(`/products?${p.toString()}`, { scroll: false })
+                  }}
+                  className="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold tracking-wide whitespace-nowrap transition-all"
+                  style={active
+                    ? { background: RED, color: COLORS.white, border: `1px solid ${RED}` }
+                    : { background: COLORS.white, color: COLORS.inkSoft, border: `1px solid ${COLORS.ashLine}` }}
+                >
+                  {chip.label}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* Active filter chips */}
@@ -215,20 +267,39 @@ function ProductsContent() {
           </div>
         )}
 
-        {/* Sidebar + grid */}
-        <div className="flex gap-6 items-start">
-          <div className={`flex-shrink-0 w-52 ${sidebarOpen ? 'block' : 'hidden'} lg:block`}>
-            <Suspense fallback={null}>
-              <CategorySidebar />
-            </Suspense>
-          </div>
-
-          <div className="flex-1 min-w-0">
+        {/* Product grid (full width) */}
+        <div>
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="h-72 rounded-2xl animate-pulse"
                     style={{ background: COLORS.white, border: `1px solid ${COLORS.ashLine}` }} />
+                ))}
+              </div>
+            ) : showGrouped ? (
+              <div className="space-y-12">
+                {categoryGroups.map(({ cat, items }) => (
+                  <section key={cat.slug}>
+                    <div className="flex items-end justify-between mb-4 pb-2" style={{ borderBottom: `1px solid ${COLORS.ashLine}` }}>
+                      <div className="flex items-baseline gap-2.5">
+                        <h2 className="font-black tracking-tight" style={{ fontSize: '1.25rem', color: COLORS.ink }}>{cat.name}</h2>
+                        <span className="text-xs font-mono" style={{ color: COLORS.inkMuted }}>{items.length}</span>
+                      </div>
+                      {items.length > PREVIEW && (
+                        <button
+                          onClick={() => applyFilter('category_id', cat.slug)}
+                          className="flex items-center gap-1.5 text-xs font-black tracking-widest uppercase transition-all hover:gap-2.5"
+                          style={{ color: RED }}
+                        >
+                          View all {items.length}
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2.5 sm:gap-3">
+                      {items.slice(0, PREVIEW).map(p => <ProductCard key={p.id} product={p} />)}
+                    </div>
+                  </section>
                 ))}
               </div>
             ) : filtered.length === 0 ? (
@@ -247,12 +318,11 @@ function ProductsContent() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2.5 sm:gap-3">
                 {filtered.map(p => <ProductCard key={p.id} product={p} />)}
               </div>
             )}
           </div>
-        </div>
       </div>
     </div>
   )

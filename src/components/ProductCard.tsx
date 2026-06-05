@@ -4,7 +4,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { COMPANY, COLORS } from '@/lib/brand'
+import { COMPANY, COLORS, PARTNER_BRANDS } from '@/lib/brand'
+
+const BRAND_LOGOS: Record<string, string> = Object.fromEntries(
+  PARTNER_BRANDS.map(b => [b.name.toLowerCase(), b.logo])
+)
 
 const RED = COLORS.red
 const WA_NUMBER = COMPANY.whatsapp.number
@@ -34,6 +38,7 @@ interface Product {
   model_number: string
   description?: string
   price?: number
+  price_old?: number | null
   brand: string
   images?: string[]
   in_stock: boolean
@@ -98,7 +103,19 @@ function InteletProductCard({ product }: { product: Product }) {
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-300"><IconBox /></div>
+          <div className="flex flex-col items-center justify-center h-full gap-2.5 px-4"
+            style={{ background: `linear-gradient(135deg, ${COLORS.ash} 0%, ${COLORS.ashDeep} 100%)` }}>
+            {BRAND_LOGOS[product.brand?.toLowerCase()] ? (
+              <Image src={BRAND_LOGOS[product.brand.toLowerCase()]} alt={product.brand}
+                width={88} height={40} className="object-contain max-h-9 w-auto opacity-90" />
+            ) : (
+              <span className="font-black tracking-tight text-lg" style={{ color: COLORS.inkSoft }}>{product.brand}</span>
+            )}
+            <span style={{ color: COLORS.inkMuted }}><IconBox /></span>
+            <span className="text-[8px] font-mono tracking-[0.25em] uppercase" style={{ color: COLORS.inkMuted }}>
+              Image coming soon
+            </span>
+          </div>
         )}
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
@@ -126,29 +143,41 @@ function InteletProductCard({ product }: { product: Product }) {
         )}
       </div>
 
-      <div className="flex flex-col flex-1 p-4">
-        <div className="text-[9px] text-gray-400 font-mono tracking-widest mb-1 uppercase">{product.model_number}</div>
-        <h3 className="font-bold leading-snug mb-2 line-clamp-2 transition-colors"
-          style={{ fontSize: '0.875rem', color: COLORS.ink }}>
+      <div className="flex flex-col flex-1 p-2.5 sm:p-3">
+        <div className="text-[8px] text-gray-400 font-mono tracking-widest mb-0.5 uppercase truncate">{product.model_number}</div>
+        <h3 className="font-bold leading-snug mb-1.5 line-clamp-2 transition-colors"
+          style={{ fontSize: '0.8rem', color: COLORS.ink }}>
           {product.title}
         </h3>
-        {product.description && (
-          <p className="text-xs line-clamp-2 mb-3 leading-relaxed" style={{ color: COLORS.inkMuted }}>{product.description}</p>
-        )}
         <div className="mt-auto">
-          {product.price && (
-            <div className="font-black text-xl mb-3" style={{ color: RED }}>
-              GH₵ {product.price.toLocaleString()}
+          {product.price != null && (
+            <div className="mb-2">
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <span className="font-black text-base sm:text-lg" style={{ color: RED }}>
+                  GH₵ {product.price.toLocaleString()}
+                </span>
+                {product.price_old != null && product.price_old > product.price && (
+                  <span className="text-sm line-through" style={{ color: COLORS.inkMuted }}>
+                    GH₵ {product.price_old.toLocaleString()}
+                  </span>
+                )}
+              </div>
+              {product.price_old != null && product.price_old > product.price && (
+                <span className="inline-block mt-1.5 px-2 py-0.5 rounded-md text-[10px] font-black tracking-wider text-white uppercase"
+                  style={{ background: RED }}>
+                  World Cup • Save GH₵ {(product.price_old - product.price).toLocaleString()}
+                </span>
+              )}
             </div>
           )}
-          <div className="flex gap-2">
+          <div className="flex gap-1.5">
             <Link href={`/products/${encodeURIComponent(product.brand)}/${product.id}`}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-black tracking-widest transition-all uppercase"
+              className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg text-[11px] font-black tracking-wide transition-all uppercase"
               style={{ border: `1px solid ${COLORS.ashLine}`, color: COLORS.inkSoft, background: COLORS.white }}>
               <IconEye /> View
             </Link>
             <a href={waUrl} target="_blank" rel="noopener noreferrer"
-              className="flex-1 bg-[#25D366] flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-black tracking-widest text-white uppercase hover:opacity-90"
+              className="flex-1 bg-[#25D366] flex items-center justify-center gap-1 py-2 rounded-lg text-[11px] font-black tracking-wide text-white uppercase hover:opacity-90"
               >
               <IconWA /> Order
             </a>

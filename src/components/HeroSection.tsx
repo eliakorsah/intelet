@@ -1,16 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { COMPANY, COLORS, FEATURED_PROMO, whatsappLink } from '@/lib/brand'
+import { COMPANY, COLORS, whatsappLink } from '@/lib/brand'
 
 const RED      = COLORS.red
 const RED_DEEP = COLORS.redDeep
 const BLUE     = COLORS.blue
-
-// Slides drawn from the featured Grand-Opening promo products.
-const slides = FEATURED_PROMO.map(p => ({ src: p.image, label: p.name }))
 
 const IconArrow = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -41,21 +37,9 @@ const IconChevronDown = () => (
 )
 
 export default function HeroSection() {
-  const [current, setCurrent] = useState(0)
-  const [prev,    setPrev]    = useState<number | null>(null)
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setPrev(current)
-      setCurrent(c => (c + 1) % slides.length)
-      setTimeout(() => setPrev(null), 900)
-    }, 3800)
-    return () => clearInterval(timer)
-  }, [current])
-
   return (
     <section
-      className="relative min-h-[92vh] flex flex-col overflow-hidden"
+      className="relative flex flex-col overflow-hidden pt-6 pb-14 lg:pt-8 lg:pb-16"
       style={{ backgroundColor: COLORS.ash }}
     >
       {/* ── Light background: ash + red blend ───────────── */}
@@ -102,38 +86,28 @@ export default function HeroSection() {
         }}
       />
 
-      {/* ── Two-column content ───────────────────────── */}
-      <div className="relative z-10 flex-1 flex items-center">
-        <div className="w-full max-w-7xl mx-auto px-6 py-20 lg:py-24">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      {/* ── Hero content ───────────────────────── */}
+      <div className="relative z-10 flex-1 flex flex-col justify-center">
+        <div className="w-full max-w-7xl mx-auto px-6 pt-16 pb-2 lg:pt-24">
+          <div className="max-w-5xl">
 
-            {/* ── LEFT: Text ── */}
+            {/* ── Text ── */}
             <div style={{ animation: 'fadeRightSpring 0.8s cubic-bezier(0.22,1,0.36,1) 0.05s both' }}>
 
               {/* Headline */}
-              <h1
-                className="font-heading font-black leading-[0.95] mb-5"
-                style={{
-                  color: COLORS.ink,
-                  fontSize: 'clamp(2.4rem, 5.5vw, 4.8rem)',
-                  letterSpacing: '-0.02em',
-                  animation: 'heroTitle 0.9s cubic-bezier(0.22,1,0.36,1) 0.22s both',
-                }}
+              <div
+                className="mb-2 -mt-2"
+                style={{ animation: 'heroTitle 0.9s cubic-bezier(0.22,1,0.36,1) 0.22s both' }}
               >
-                Unbeatable{' '}
-                <span
-                  style={{
-                    background: `linear-gradient(90deg, ${RED} 0%, ${RED_DEEP} 100%)`,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                  }}
-                >
-                  DISCOUNTS
-                </span>
-                <br />
-                on Home Appliances
-              </h1>
+                <Image
+                  src="/BuyNow.png"
+                  alt="Unbeatable Discounts on Home Appliances"
+                  width={1536}
+                  height={1024}
+                  priority
+                  className="w-full max-w-[1100px] h-auto"
+                />
+              </div>
 
               {/* Subtext */}
               <p
@@ -215,104 +189,8 @@ export default function HeroSection() {
               </div>
             </div>
 
-            {/* ── RIGHT: Appliance slideshow ── */}
-            <div
-              className="hidden lg:flex items-center justify-center"
-              style={{ animation: 'fadeLeftSpring 0.9s cubic-bezier(0.22,1,0.36,1) 0.35s both' }}
-            >
-              <div
-                style={{
-                  position: 'relative',
-                  width: '100%',
-                  maxWidth: '520px',
-                  aspectRatio: '1/1',
-                  borderRadius: '24px',
-                  background: `radial-gradient(circle at 50% 40%, ${COLORS.white} 0%, ${COLORS.ash} 75%)`,
-                  border: `1px solid ${COLORS.ashLine}`,
-                  boxShadow: `0 40px 80px -40px ${RED}66`,
-                  overflow: 'hidden',
-                }}
-              >
-                {slides.map((s, i) => {
-                  const isActive = i === current
-                  const isPrev   = i === prev
-                  return (
-                    <div
-                      key={s.src}
-                      style={{
-                        position: 'absolute', inset: 24,
-                        opacity: isActive ? 1 : 0,
-                        transform: isActive ? 'scale(1)' : isPrev ? 'scale(1.06)' : 'scale(0.96)',
-                        transition: 'opacity 0.85s cubic-bezier(0.22,1,0.36,1), transform 0.85s cubic-bezier(0.22,1,0.36,1)',
-                        zIndex: isActive ? 2 : isPrev ? 1 : 0,
-                      }}
-                    >
-                      <Image
-                        src={s.src}
-                        alt={s.label}
-                        fill
-                        className="object-contain"
-                        sizes="520px"
-                        priority={i === 0}
-                      />
-                    </div>
-                  )
-                })}
-
-                {/* Floating % off sticker */}
-                <div
-                  className="absolute font-heading font-black text-white flex flex-col items-center justify-center"
-                  style={{
-                    top: '20px', right: '20px', width: '92px', height: '92px',
-                    borderRadius: '50%',
-                    background: `linear-gradient(135deg, ${RED} 0%, ${RED_DEEP} 100%)`,
-                    boxShadow: `0 12px 30px -8px ${RED}`,
-                    transform: 'rotate(-8deg)',
-                    zIndex: 3,
-                  }}
-                >
-                  <span className="text-[10px] tracking-[0.18em] opacity-90">UP TO</span>
-                  <span className="text-2xl leading-none">40%</span>
-                  <span className="text-[10px] tracking-[0.18em] opacity-90">OFF</span>
-                </div>
-
-                {/* Label ribbon */}
-                <div
-                  className="absolute left-6 right-6 bottom-6 flex items-center justify-between px-4 py-3 rounded-xl"
-                  style={{ background: COLORS.white, border: `1px solid ${COLORS.ashLine}`, zIndex: 3 }}
-                >
-                  <div>
-                    <div className="text-[10px] font-mono tracking-[0.18em]" style={{ color: COLORS.inkMuted }}>
-                      FEATURED APPLIANCES
-                    </div>
-                    <div className="text-sm font-heading font-bold" style={{ color: COLORS.ink }}>
-                      {slides[current]?.label}
-                    </div>
-                  </div>
-                  <div className="flex gap-1.5">
-                    {slides.map((_, i) => (
-                      <span
-                        key={i}
-                        style={{
-                          width: i === current ? 18 : 6, height: 6, borderRadius: 4,
-                          background: i === current ? RED : COLORS.ashLine,
-                          transition: 'all 0.35s ease',
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
           </div>
         </div>
-      </div>
-
-      {/* Scroll cue */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 animate-bounce" style={{ color: COLORS.inkMuted }}>
-        <span className="text-[10px] font-mono tracking-[0.25em]">SCROLL</span>
-        <IconChevronDown />
       </div>
     </section>
   )

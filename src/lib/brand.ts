@@ -20,8 +20,8 @@ export const COMPANY = {
     secondary: '+233541407551',
     secondaryFmt: '+233 54 140 7551',
   },
-  email: 'info@intelet.com.gh',  // placeholder — confirm with client
-  baseUrl: 'https://www.intelet.com.gh',
+  email: 'info@inteletelectropoint.com',  // confirm real inbox with client
+  baseUrl: 'https://www.inteletelectropoint.com',
   whatsapp: {
     number: '233246549409',
     defaultMsg: 'Hello%20Intelet%2C%20I%20would%20like%20more%20info%20about%20the%20Grand%20Opening%20promo',

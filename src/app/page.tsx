@@ -11,9 +11,7 @@ import {
   COLORS,
   PARTNER_BRANDS,
   APPLIANCE_CATEGORIES,
-  FEATURED_PROMO,
   whatsappLink,
-  formatPrice,
 } from '@/lib/brand'
 
 const RED      = COLORS.red
@@ -88,21 +86,22 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Grand Opening Featured Promo ─────────────── */}
+      {/* ── World Cup Featured Deals (DB) ─────────────── */}
+      {featured.length > 0 && (
       <section id="grand-opening" style={{ background: COLORS.ash }} className="py-24">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-[1600px] mx-auto px-6">
           <ScrollReveal direction="up" duration={700}>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 gap-4">
               <div>
                 <p className="font-mono text-[11px] tracking-[0.35em] uppercase mb-3" style={{ color: RED }}>
-                  FEATURED DEALS
+                  WORLD CUP PROMO
                 </p>
                 <h2 className="font-heading font-black tracking-tight leading-[1.05]"
                   style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', color: COLORS.ink }}>
-                  Promo <span style={{ color: RED }}>DISCOUNTS</span> on<br />Featured Appliances
+                  Top <span style={{ color: RED }}>DEALS</span> on<br />Best-Selling Appliances
                 </h2>
                 <p className="mt-4 text-sm leading-relaxed max-w-lg" style={{ color: COLORS.inkSoft }}>
-                  Handpicked deals at unbeatable prices. Walk into our showroom at{' '}
+                  Our best sellers at World Cup prices — Bruhm and more. Walk into our showroom at{' '}
                   {COMPANY.address.line1}, next to MTN on the N1 Highway, or message us on WhatsApp.
                 </p>
               </div>
@@ -117,68 +116,16 @@ export default async function HomePage() {
             </div>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {FEATURED_PROMO.map((p, i) => (
-              <ScrollReveal key={p.id} delay={i * 80} direction="up" duration={700} distance={50}>
-                <div
-                  className="group rounded-2xl overflow-hidden bg-white h-full flex flex-col transition-all duration-300 hover:-translate-y-1"
-                  style={{
-                    border: `1px solid ${COLORS.ashLine}`,
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                  }}
-                >
-                  <div className="relative w-full overflow-hidden" style={{ height: '220px', background: COLORS.ash }}>
-                    <Image
-                      src={p.image}
-                      alt={p.name}
-                      fill
-                      className="object-contain p-5 transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    />
-                    {/* Warranty badge */}
-                    <div
-                      className="absolute top-3 left-3 inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-mono tracking-widest"
-                      style={{ background: COLORS.white, color: COLORS.ink, border: `1px solid ${COLORS.ashLine}` }}
-                    >
-                      <IconShield size={10} /> 12M WARRANTY
-                    </div>
-                    {/* Brand tag */}
-                    <div
-                      className="absolute top-3 right-3 px-2 py-1 rounded-md text-[10px] font-heading font-bold tracking-widest"
-                      style={{ background: RED, color: COLORS.white }}
-                    >
-                      {p.brand.toUpperCase()}
-                    </div>
-                  </div>
-                  <div className="px-5 py-5 flex-1 flex flex-col">
-                    <h3 className="font-heading font-bold text-base leading-snug mb-3" style={{ color: COLORS.ink }}>
-                      {p.name}
-                    </h3>
-                    <div className="mt-auto">
-                      {p.oldPrice != null && (
-                        <div className="text-xs line-through mb-0.5" style={{ color: COLORS.inkMuted }}>
-                          {formatPrice(p.oldPrice)}
-                        </div>
-                      )}
-                      <div className="flex items-baseline gap-2">
-                        <span className="font-heading font-black text-xl" style={{ color: RED }}>
-                          {formatPrice(p.promoPrice)}
-                        </span>
-                        {p.discountPct != null && (
-                          <span className="text-[10px] font-mono tracking-widest px-1.5 py-0.5 rounded"
-                            style={{ background: COLORS.redSoft, color: RED_DEEP }}>
-                            -{p.discountPct}%
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2.5 sm:gap-3">
+            {featured.map((product: any, i: number) => (
+              <ScrollReveal key={product.id} delay={i * 80} direction="up" duration={700} distance={50}>
+                <ProductCard product={product} />
               </ScrollReveal>
             ))}
           </div>
         </div>
       </section>
+      )}
 
       {/* ── Shop by Category ─────────────────────────── */}
       <section style={{ background: COLORS.white }} className="py-24">
@@ -239,45 +186,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Featured Products (DB) ──────────────────── */}
-      {featured.length > 0 && (
-        <section style={{ background: COLORS.ash }} className="py-24">
-          <div className="max-w-7xl mx-auto px-6">
-            <ScrollReveal direction="up" duration={700}>
-              <div className="flex items-end justify-between mb-14">
-                <div>
-                  <p className="font-mono text-[11px] tracking-[0.35em] uppercase mb-2" style={{ color: RED }}>
-                    Handpicked
-                  </p>
-                  <h2 className="font-heading font-black tracking-tight"
-                    style={{ fontSize: '2.6rem', color: COLORS.ink }}>
-                    Featured Products
-                  </h2>
-                </div>
-                <Link href="/products"
-                  className="flex items-center gap-2 text-sm font-heading font-bold tracking-widest uppercase transition-all hover:gap-3"
-                  style={{ color: RED }}>
-                  View All <IconArrow size={15} />
-                </Link>
-              </div>
-            </ScrollReveal>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featured.map((product: any, i: number) => (
-                <ScrollReveal key={product.id} delay={i * 90} direction="up" duration={700} distance={50}>
-                  <Suspense fallback={<div className="rounded-2xl animate-pulse" style={{ background: COLORS.white, height: '320px' }} />}>
-                    <ProductCard product={product} />
-                  </Suspense>
-                </ScrollReveal>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* ── Latest Products (DB) ────────────────────── */}
       {latest.length > 0 && (
         <section style={{ background: COLORS.white }} className="py-24">
-          <div className="max-w-7xl mx-auto px-6">
+          <div className="max-w-[1600px] mx-auto px-6">
             <ScrollReveal direction="up" duration={700}>
               <div className="flex items-end justify-between mb-14">
                 <div>
@@ -296,7 +208,7 @@ export default async function HomePage() {
                 </Link>
               </div>
             </ScrollReveal>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2.5 sm:gap-3">
               {latest.map((product: any, i: number) => (
                 <ScrollReveal key={product.id} delay={i * 50} direction="up" duration={650} distance={40}>
                   <Suspense fallback={<div className="rounded-2xl animate-pulse" style={{ background: COLORS.ash, height: '290px' }} />}>

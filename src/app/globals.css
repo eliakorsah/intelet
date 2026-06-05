@@ -461,3 +461,14 @@ img.blur-load.loaded {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Stop mobile browsers auto-zooming when a form field is focused.
+   Inputs under 16px trigger the zoom, so force ≥16px on small screens
+   (keeps pinch-to-zoom intact). */
+@media screen and (max-width: 767px) {
+  input:not([type='checkbox']):not([type='radio']),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

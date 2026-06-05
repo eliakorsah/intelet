@@ -6,6 +6,8 @@ export type Brand =
   | 'TCL'
   | 'NASCO'
   | 'Haier'
+  | 'Beko'
+  | 'Philips'
   | 'Refrigerators'
   | 'Chest Freezers'
   | 'Washing Machines'
@@ -21,6 +23,8 @@ export const BRANDS: Brand[] = [
   'TCL',
   'NASCO',
   'Haier',
+  'Beko',
+  'Philips',
   'Refrigerators',
   'Chest Freezers',
   'Washing Machines',
@@ -36,6 +40,7 @@ export interface Product {
   brand: Brand
   description: string
   price: number | null
+  price_old: number | null
   images: string[]
   in_stock: boolean
   featured: boolean

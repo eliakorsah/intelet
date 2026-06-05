@@ -97,8 +97,48 @@ export default async function ProductPage({
   const specs  = product.specifications && Object.keys(product.specifications).length > 0
     ? product.specifications as Record<string, string> : null
 
+  // Absolute image URLs for structured data (Google prefers absolute).
+  const absImages = images.map((u: string) => (u.startsWith('http') ? u : `${COMPANY.baseUrl}${u}`))
+  const productUrl = `${COMPANY.baseUrl}/products/${encodeURIComponent(product.brand)}/${product.id}`
+
+  // Product rich-result schema (price, availability, brand → Google snippet).
+  const productLd: Record<string, any> = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.title,
+    sku: product.model_number,
+    mpn: product.model_number,
+    brand: { '@type': 'Brand', name: product.brand },
+    description: product.description || `${product.title} (${product.model_number}) — genuine ${product.brand} with a 12-month warranty at ${COMPANY.name}, Accra.`,
+    ...(absImages.length ? { image: absImages } : {}),
+    ...(product.price != null ? {
+      offers: {
+        '@type': 'Offer',
+        url: productUrl,
+        priceCurrency: 'GHS',
+        price: Number(product.price),
+        itemCondition: 'https://schema.org/NewCondition',
+        availability: product.in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        seller: { '@type': 'Organization', name: COMPANY.name },
+      },
+    } : {}),
+  }
+
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: COMPANY.baseUrl },
+      { '@type': 'ListItem', position: 2, name: 'Products', item: `${COMPANY.baseUrl}/products` },
+      { '@type': 'ListItem', position: 3, name: product.brand, item: `${COMPANY.baseUrl}/products?brand=${encodeURIComponent(product.brand)}` },
+      { '@type': 'ListItem', position: 4, name: product.title, item: productUrl },
+    ],
+  }
+
   return (
     <div style={{ background: COLORS.ash, minHeight: '100vh' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
       {/* Breadcrumb */}
       <div style={{ background: COLORS.white, borderBottom: `1px solid ${COLORS.ashLine}` }}>
@@ -168,12 +208,27 @@ export default async function ProductPage({
               </span>
             </div>
 
-            {product.price && (
+            {product.price != null && (
               <div className="mb-6 pb-6" style={{ borderBottom: `1px solid ${COLORS.ashLine}` }}>
-                <p className="text-[9px] font-mono tracking-widest mb-1" style={{ color: COLORS.inkMuted }}>PRICE</p>
-                <p className="font-black" style={{ fontSize: '2.4rem', color: RED, lineHeight: 1 }}>
-                  GH₵ {product.price.toLocaleString()}
+                <p className="text-[9px] font-mono tracking-widest mb-1" style={{ color: COLORS.inkMuted }}>
+                  {product.price_old != null && product.price_old > product.price ? 'WORLD CUP PROMO' : 'PRICE'}
                 </p>
+                <div className="flex items-baseline gap-3 flex-wrap">
+                  <p className="font-black" style={{ fontSize: '2.4rem', color: RED, lineHeight: 1 }}>
+                    GH₵ {product.price.toLocaleString()}
+                  </p>
+                  {product.price_old != null && product.price_old > product.price && (
+                    <p className="font-bold text-xl line-through" style={{ color: COLORS.inkMuted }}>
+                      GH₵ {product.price_old.toLocaleString()}
+                    </p>
+                  )}
+                </div>
+                {product.price_old != null && product.price_old > product.price && (
+                  <span className="inline-block mt-2 px-2.5 py-1 rounded-md text-[11px] font-black tracking-wider text-white uppercase"
+                    style={{ background: RED }}>
+                    Save GH₵ {(product.price_old - product.price).toLocaleString()}
+                  </span>
+                )}
               </div>
             )}
 

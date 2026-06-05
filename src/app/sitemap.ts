@@ -13,11 +13,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
   ]
 
-  // Dynamic product pages
+  // Dynamic product pages — include every product (in & out of stock) so they
+  // can all be indexed; availability is conveyed via the Product JSON-LD.
   const { data: products } = await supabase
     .from('products')
     .select('id, brand, updated_at')
-    .eq('in_stock', true)
 
   const product_pages: MetadataRoute.Sitemap = (products || []).map(p => ({
     url: `${BASE}/products/${encodeURIComponent(p.brand)}/${p.id}`,
