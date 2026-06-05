@@ -8,6 +8,10 @@ import { COMPANY, COLORS, PARTNER_BRANDS, whatsappLink } from '@/lib/brand'
 
 const RED = COLORS.red
 
+// Cache each product page for 5 min (ISR) so crawler/visitor traffic doesn't
+// hit Supabase on every request. Admin edits still appear within ~5 minutes.
+export const revalidate = 300
+
 const brandLogos: Record<string, string> = Object.fromEntries(
   PARTNER_BRANDS.map(b => [b.name, b.logo])
 )
