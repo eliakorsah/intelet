@@ -17,6 +17,10 @@ import {
 const RED      = COLORS.red
 const RED_DEEP = COLORS.redDeep
 
+// Re-fetch product data (incl. newly added images) at most every 60s instead
+// of freezing it at build time, so admin edits show on the home page.
+export const revalidate = 60
+
 const IconArrow = ({ size = 16 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
