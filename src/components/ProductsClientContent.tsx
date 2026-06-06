@@ -2,11 +2,13 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import Image from 'next/image'
 import ProductCard from '@/components/ProductCard'
 import { supabase } from '@/lib/supabase'
 import { COLORS, PARTNER_BRANDS, APPLIANCE_CATEGORIES } from '@/lib/brand'
 
 const RED = COLORS.red
+const PAGE_SIZE = 24   // cap the catalogue scroll; "Load more" reveals the rest
 
 // Build brand → category_id slug map.
 // Each partner brand matches its own slug plus brand-category combos
@@ -77,8 +79,23 @@ function ProductsContent() {
   const [search,      setSearch]      = useState(searchParams.get('search') || '')
   const [brand,       setBrand]       = useState(searchParams.get('brand') || '')
   const [inStockOnly, setInStockOnly] = useState(false)
+  const [searchFocused, setSearchFocused] = useState(false)
+  const [visibleCount, setVisibleCount]   = useState(PAGE_SIZE)
 
   const categoryId = searchParams.get('category_id') || searchParams.get('category') || ''
+
+  // Reset pagination whenever the filter set changes.
+  useEffect(() => { setVisibleCount(PAGE_SIZE) }, [search, brand, categoryId, inStockOnly])
+
+  // Google-style instant suggestions from the in-memory product list.
+  const suggestions = search.trim().length >= 1
+    ? (() => {
+        const q = search.toLowerCase()
+        return products
+          .filter(p => `${p.title} ${p.model_number} ${p.brand}`.toLowerCase().includes(q))
+          .slice(0, 8)
+      })()
+    : []
 
   useEffect(() => {
     supabase.from('products').select('*').order('created_at', { ascending: false })
@@ -178,7 +195,7 @@ function ProductsContent() {
         {/* Top filter bar */}
         <div className="flex flex-wrap gap-2 mb-5">
           <div className="relative flex-1 min-w-[180px]">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: COLORS.inkMuted }}>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10" style={{ color: COLORS.inkMuted }}>
               <IconSearch />
             </span>
             <input
@@ -187,10 +204,43 @@ function ProductsContent() {
               value={search}
               onChange={e => { setSearch(e.target.value); applyFilter('search', e.target.value) }}
               className="w-full pl-8 pr-3 py-2.5 rounded-xl bg-white text-sm outline-none transition-colors"
-              style={{ border: `1px solid ${COLORS.ashLine}`, color: COLORS.ink }}
-              onFocus={e => { e.currentTarget.style.borderColor = RED }}
-              onBlur={e => { e.currentTarget.style.borderColor = COLORS.ashLine }}
+              style={{ border: `1px solid ${searchFocused ? RED : COLORS.ashLine}`, color: COLORS.ink }}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
             />
+
+            {/* Google-style suggestions dropdown */}
+            {searchFocused && suggestions.length > 0 && (
+              <div className="absolute left-0 right-0 top-full mt-1.5 z-30 rounded-xl overflow-hidden bg-white"
+                style={{ border: `1px solid ${COLORS.ashLine}`, boxShadow: '0 18px 48px rgba(0,0,0,0.14)' }}>
+                {suggestions.map(p => {
+                  const img = (p.images || []).filter(Boolean)[0]
+                  return (
+                    <button
+                      key={p.id}
+                      onMouseDown={() => router.push(`/products/${encodeURIComponent(p.brand)}/${p.id}`)}
+                      className="flex items-center gap-3 w-full text-left px-3 py-2.5 transition-colors hover:bg-gray-50"
+                    >
+                      <div className="relative flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center" style={{ background: COLORS.ash }}>
+                        {img
+                          ? <Image src={img} alt={p.title} fill className="object-cover" sizes="40px" />
+                          : <span className="text-[8px] font-black" style={{ color: COLORS.inkMuted }}>{p.brand?.slice(0, 4).toUpperCase()}</span>}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold truncate" style={{ color: COLORS.ink }}>{p.title}</div>
+                        <div className="text-[10px] font-mono truncate" style={{ color: COLORS.inkMuted }}>{p.brand} · {p.model_number}</div>
+                      </div>
+                      {p.price != null && (
+                        <div className="text-xs font-black flex-shrink-0" style={{ color: RED }}>GH₵ {Number(p.price).toLocaleString()}</div>
+                      )}
+                    </button>
+                  )
+                })}
+                <div className="px-3 py-2 text-[10px] font-mono tracking-wider text-center" style={{ color: COLORS.inkMuted, borderTop: `1px solid ${COLORS.ashLine}` }}>
+                  Showing top matches — keep typing to refine
+                </div>
+              </div>
+            )}
           </div>
 
           <button
@@ -318,9 +368,26 @@ function ProductsContent() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2.5 sm:gap-3">
-                {filtered.map(p => <ProductCard key={p.id} product={p} />)}
-              </div>
+              <>
+                <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2.5 sm:gap-3">
+                  {filtered.slice(0, visibleCount).map(p => <ProductCard key={p.id} product={p} />)}
+                </div>
+
+                {filtered.length > visibleCount && (
+                  <div className="flex flex-col items-center gap-3 mt-10">
+                    <p className="text-xs font-mono" style={{ color: COLORS.inkMuted }}>
+                      Showing {Math.min(visibleCount, filtered.length)} of {filtered.length}
+                    </p>
+                    <button
+                      onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+                      className="px-8 py-3 rounded-xl font-black text-sm uppercase tracking-widest transition-all hover:opacity-90 active:scale-95"
+                      style={{ background: RED, color: COLORS.white }}
+                    >
+                      Load more
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
       </div>
