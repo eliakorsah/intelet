@@ -53,9 +53,11 @@ const stats = [
 ]
 
 async function getFeaturedProducts() {
+  // All starred (featured) products — no cap, so every product the admin
+  // stars appears in the Top Sellers section.
   const { data } = await supabase.from('products').select('*')
     .eq('featured', true).eq('in_stock', true)
-    .order('created_at', { ascending: false }).limit(6)
+    .order('created_at', { ascending: false })
   return data || []
 }
 
