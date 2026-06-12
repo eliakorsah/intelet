@@ -88,6 +88,37 @@ export default function ContactForm() {
               </div>
             ))}
 
+            {/* Branches */}
+            <div
+              className="p-4 sm:p-5 rounded-xl"
+              style={{ background: COLORS.white, border: `1px solid ${COLORS.ashLine}` }}
+            >
+              <h3 className="font-heading font-semibold text-sm tracking-widest mb-4" style={{ color: RED }}>
+                OUR BRANCHES
+              </h3>
+              <div className="space-y-4">
+                {COMPANY.branches.map(b => (
+                  <div key={b.name} className="pb-4 last:pb-0" style={{ borderBottom: `1px solid ${COLORS.ashLine}` }}>
+                    <div className="font-heading font-bold text-sm mb-1.5" style={{ color: COLORS.ink }}>{b.name} Branch</div>
+                    {b.address && (
+                      <div className="flex items-start gap-2 text-sm mb-1.5" style={{ color: COLORS.inkSoft }}>
+                        <MapPin size={15} style={{ color: RED, flexShrink: 0, marginTop: 2 }} />{b.address}
+                      </div>
+                    )}
+                    <div className="flex flex-wrap items-center gap-3">
+                      <a href={`tel:${b.phoneFmt.replace(/\s/g, '')}`} className="flex items-center gap-1.5 text-sm hover:underline" style={{ color: COLORS.ink }}>
+                        <Phone size={14} style={{ color: RED }} />{b.phoneFmt}
+                      </a>
+                      <a href={`https://wa.me/${b.whatsapp}`} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg text-white" style={{ background: '#25D366' }}>
+                        <MessageCircle size={13} /> WhatsApp {b.name}
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div
               className="p-4 sm:p-5 rounded-xl"
               style={{ background: COLORS.white, border: `1px solid ${COLORS.ashLine}` }}

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Phone, Mail, MapPin, ShieldCheck, Instagram, Facebook, Twitter } from 'lucide-react'
+import { Phone, Mail, MapPin, MessageCircle, ShieldCheck, Instagram, Facebook, Twitter } from 'lucide-react'
 import { COMPANY, COLORS, PARTNER_BRANDS, APPLIANCE_CATEGORIES, whatsappLink } from '@/lib/brand'
 
 export default function Footer() {
@@ -126,38 +126,36 @@ export default function Footer() {
           {/* Contact */}
           <div>
             <h3 className="font-heading font-700 text-white text-sm tracking-widest mb-4 uppercase">
-              Visit / Contact
+              Our Branches
             </h3>
-            <div className="space-y-3">
-              <a
-                href={`tel:${COMPANY.phones.primary}`}
-                className="flex items-start gap-3 text-slate-400 hover:text-white transition-colors group"
-              >
-                <Phone size={16} className="mt-0.5 shrink-0 group-hover:text-[#C8102E]" />
-                <span className="text-sm">{COMPANY.phones.primaryFmt}</span>
-              </a>
-              <a
-                href={`tel:${COMPANY.phones.secondary}`}
-                className="flex items-start gap-3 text-slate-400 hover:text-white transition-colors group"
-              >
-                <Phone size={16} className="mt-0.5 shrink-0 group-hover:text-[#C8102E]" />
-                <span className="text-sm">{COMPANY.phones.secondaryFmt}</span>
-              </a>
+            <div className="space-y-4">
+              {COMPANY.branches.map(b => (
+                <div key={b.name}>
+                  <div className="text-white text-sm font-bold mb-1.5">{b.name} Branch</div>
+                  {b.address && (
+                    <div className="flex items-start gap-2 text-slate-400 mb-1.5">
+                      <MapPin size={15} className="mt-0.5 shrink-0 text-[#C8102E]" />
+                      <span className="text-sm leading-relaxed">{b.address}</span>
+                    </div>
+                  )}
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                    <a href={`tel:${b.phoneFmt.replace(/\s/g, '')}`} className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors">
+                      <Phone size={14} className="shrink-0" /><span className="text-sm">{b.phoneFmt}</span>
+                    </a>
+                    <a href={`https://wa.me/${b.whatsapp}`} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors">
+                      <MessageCircle size={14} className="shrink-0" /><span className="text-sm">WhatsApp</span>
+                    </a>
+                  </div>
+                </div>
+              ))}
               <a
                 href={`mailto:${COMPANY.email}`}
-                className="flex items-start gap-3 text-slate-400 hover:text-white transition-colors group"
+                className="flex items-start gap-3 text-slate-400 hover:text-white transition-colors group pt-1"
               >
                 <Mail size={16} className="mt-0.5 shrink-0 group-hover:text-[#C8102E]" />
                 <span className="text-sm break-all">{COMPANY.email}</span>
               </a>
-              <div className="flex items-start gap-3 text-slate-400">
-                <MapPin size={16} className="mt-0.5 shrink-0 text-[#C8102E]" />
-                <span className="text-sm leading-relaxed">
-                  {COMPANY.address.line1}<br />
-                  {COMPANY.address.line2}<br />
-                  {COMPANY.address.city}, {COMPANY.address.country}
-                </span>
-              </div>
             </div>
           </div>
         </div>

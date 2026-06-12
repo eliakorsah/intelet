@@ -15,17 +15,32 @@ export const COMPANY = {
     full:    'LAPAZ-AKWETEYMAN, NEXT TO MTN ON THE N1 HIGHWAY, ACCRA',
   },
   phones: {
-    primary:   '+233246549409',
-    primaryFmt:   '+233 24 654 9409',
+    primary:   '+233501409628',
+    primaryFmt:   '+233 50 140 9628',
     secondary: '+233541407551',
     secondaryFmt: '+233 54 140 7551',
   },
   email: 'info@inteletelectropoint.com',  // confirm real inbox with client
   baseUrl: 'https://www.inteletelectropoint.com',
   whatsapp: {
-    number: '233246549409',
+    number: '233501409628',
     defaultMsg: 'Hello%20Intelet%2C%20I%20would%20like%20more%20info%20about%20the%20Grand%20Opening%20promo',
   },
+  // Two main branches. Numbers stored international, no '+' for wa.me links.
+  branches: [
+    {
+      name:     'Akweteyman',
+      address:  'Lapaz-Akweteyman, Next to MTN on the N1 Highway, Accra',
+      phoneFmt: '+233 50 140 9628',
+      whatsapp: '233501409628',
+    },
+    {
+      name:     'Fise',
+      address:  '',                    // TODO: confirm Fise branch address
+      phoneFmt: '+233 24 474 0994',
+      whatsapp: '233244740994',
+    },
+  ],
 } as const
 
 export const whatsappLink = (msg: string = COMPANY.whatsapp.defaultMsg) =>
