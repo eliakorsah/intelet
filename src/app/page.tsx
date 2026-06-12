@@ -26,11 +26,6 @@ const IconArrow = ({ size = 16 }: { size?: number }) => (
     <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
   </svg>
 )
-const IconShield = ({ size = 14 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-  </svg>
-)
 const IconCheck = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="m5 12 5 5L20 7"/>
@@ -308,50 +303,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Final CTA ───────────────────────────────── */}
-      <section
-        className="py-24 relative overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${RED_DEEP} 0%, ${RED} 50%, ${RED_DEEP} 100%)` }}
-      >
-        {/* Soft orbs */}
-        <div className="absolute pointer-events-none" style={{
-          top: '10%', left: '50%', transform: 'translateX(-50%)',
-          width: '500px', height: '250px',
-          background: 'radial-gradient(ellipse, rgba(255,255,255,0.15) 0%, transparent 70%)',
-          filter: 'blur(40px)',
-        }} />
-
-        <ScrollReveal direction="up" duration={800}>
-          <div className="relative max-w-2xl mx-auto px-6 text-center">
-            <div className="inline-flex items-center gap-2 mb-7 px-5 py-2.5 rounded-full"
-              style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)' }}>
-              <span className="flex" style={{ color: COLORS.white }}><IconShield size={12} /></span>
-              <span className="font-mono text-[10px] tracking-[0.3em] uppercase" style={{ color: COLORS.white }}>
-                NOW OPEN · {COMPANY.address.line1}
-              </span>
-            </div>
-            <h2 className="font-heading font-black text-white leading-tight tracking-tight mb-5"
-              style={{ fontSize: 'clamp(2rem, 6vw, 3.2rem)' }}>
-              Visit our showroom<br />at {COMPANY.address.line1}
-            </h2>
-            <p className="max-w-lg mx-auto mb-10 leading-relaxed text-sm" style={{ color: 'rgba(255,255,255,0.85)' }}>
-              {COMPANY.address.line2}, {COMPANY.address.city}. Walk in, WhatsApp us, or call to get the best price on your next appliance.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href={whatsappLink()}
-                target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-9 py-4 rounded-xl font-heading font-black tracking-widest text-sm uppercase transition-all hover:opacity-90 active:scale-95"
-                style={{ background: COLORS.white, color: RED }}>
-                WhatsApp {COMPANY.phones.primaryFmt}
-              </a>
-              <Link href="/contact"
-                className="inline-flex items-center justify-center gap-2 px-9 py-4 rounded-xl font-heading font-black tracking-widest text-sm uppercase text-white border border-white/40 bg-white/10 hover:bg-white/20 transition-all active:scale-95">
-                Get Directions <IconArrow size={15} />
-              </Link>
-            </div>
-          </div>
-        </ScrollReveal>
-      </section>
     </>
   )
 }

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Phone, Mail, MapPin, MessageCircle, ShieldCheck, Instagram, Facebook, Twitter } from 'lucide-react'
-import { COMPANY, COLORS, PARTNER_BRANDS, APPLIANCE_CATEGORIES, whatsappLink } from '@/lib/brand'
+import { COMPANY, COLORS, PARTNER_BRANDS, APPLIANCE_CATEGORIES } from '@/lib/brand'
 
 export default function Footer() {
   return (
@@ -21,24 +21,21 @@ export default function Footer() {
             UNBEATABLE PRICES ON <span className="underline decoration-white/40 decoration-4 underline-offset-4">QUALITY APPLIANCES</span>
           </h2>
           <p className="text-white/80 mb-6 max-w-xl mx-auto">
-            Visit us at {COMPANY.address.line1}, next to MTN on the N1 Highway.
-            Genuine fridges, freezers, washing machines, ACs and TVs — all with a 12-month warranty.
+            Two branches to serve you — <strong className="text-white">Akweteyman</strong> (next to MTN on the N1 Highway)
+            and <strong className="text-white">Fise</strong>. Walk in or WhatsApp the branch nearest you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href={whatsappLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-3 rounded-lg font-heading font-700 tracking-wide bg-white text-[#C8102E] hover:bg-[#F5F4F2] transition"
-            >
-              WhatsApp {COMPANY.phones.primaryFmt}
-            </a>
-            <a
-              href={`tel:${COMPANY.phones.secondary}`}
-              className="px-8 py-3 rounded-lg font-heading font-700 tracking-wide border-2 border-white text-white hover:bg-white hover:text-[#C8102E] transition"
-            >
-              Call {COMPANY.phones.secondaryFmt}
-            </a>
+            {COMPANY.branches.map(b => (
+              <a
+                key={b.name}
+                href={`https://wa.me/${b.whatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-8 py-3 rounded-lg font-heading font-700 tracking-wide bg-white text-[#C8102E] hover:bg-[#F5F4F2] transition"
+              >
+                WhatsApp {b.name} · {b.phoneFmt}
+              </a>
+            ))}
           </div>
         </div>
       </div>
