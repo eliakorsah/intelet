@@ -36,7 +36,7 @@ export const COMPANY = {
     },
     {
       name:     'Fise',
-      address:  '',                    // TODO: confirm Fise branch address
+      address:  'Amasaman — adjacent to GCB Amasaman Branch / Puma Filling Station',
       phoneFmt: '+233 24 474 0994',
       whatsapp: '233244740994',
     },
@@ -86,6 +86,7 @@ export const PARTNER_BRANDS: PartnerBrand[] = [
   { name: 'Midea',    slug: 'midea',    logo: '/Midea.png' },
   { name: 'Bruhm',    slug: 'bruhm',    logo: '/bruhm_brand.jpg' },
   { name: 'Tamashi',  slug: 'tamashi',  logo: '/TAMASHI.jpg' },
+  { name: 'TCL',      slug: 'tcl',      logo: '/tcl.svg', accent: COLORS.tclRed },
   { name: 'NASCO',    slug: 'nasco',    logo: '/nasco.png' },
   { name: 'Philips',  slug: 'philips',  logo: '/philips.svg' },
   { name: 'Haier',    slug: 'haier',    logo: '/haier.svg' },
