@@ -22,7 +22,8 @@ export default function Footer() {
           </h2>
           <p className="text-white/80 mb-6 max-w-xl mx-auto">
             Two branches to serve you — <strong className="text-white">Akweteyman</strong> (next to MTN on the N1 Highway)
-            and <strong className="text-white">Fise</strong>. Walk in or WhatsApp the branch nearest you.
+            and <strong className="text-white">Fise</strong> (Amasaman, adjacent to GCB Amasaman Branch / Puma Filling Station).
+            Walk in or WhatsApp the branch nearest you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {COMPANY.branches.map(b => (
