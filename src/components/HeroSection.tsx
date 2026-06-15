@@ -117,8 +117,9 @@ export default function HeroSection() {
                   animation: 'fadeUpSpring 0.8s cubic-bezier(0.22,1,0.36,1) 0.38s both',
                 }}
               >
-                {COMPANY.name} is open at{' '}
-                <strong style={{ color: COLORS.ink }}>{COMPANY.address.line1}</strong> — next to MTN on the N1 Highway.
+                {COMPANY.name} now has two branches —{' '}
+                <strong style={{ color: COLORS.ink }}>Akweteyman</strong> (next to MTN on the N1 Highway) and{' '}
+                <strong style={{ color: COLORS.ink }}>Fise</strong> (Amasaman, adjacent to GCB Amasaman / Puma Filling Station).
                 Fridges, freezers, washing machines, ACs &amp; TVs from Samsung, Midea, Bruhm, Tamashi, TCL, NASCO &amp; Haier —
                 every unit backed by a <strong style={{ color: RED }}>12-month warranty</strong>.
               </p>

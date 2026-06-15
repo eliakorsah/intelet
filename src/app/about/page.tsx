@@ -9,7 +9,7 @@ const RED_DEEP = COLORS.redDeep
 
 export const metadata: Metadata = {
   title: 'About Us',
-  description: `${COMPANY.name} — Ghana's home of quality home appliances. Authorised dealer for Samsung, Midea, Bruhm, Tamashi, TCL, NASCO and Haier. Showroom at ${COMPANY.address.line1}, next to MTN on the N1 Highway.`,
+  description: `${COMPANY.name} — Ghana's home of quality home appliances. Authorised dealer for Samsung, Midea, Bruhm, Tamashi, TCL, NASCO and Haier. Two branches: Akweteyman (next to MTN on the N1 Highway) and Fise (Amasaman, adjacent to GCB Amasaman / Puma Filling Station).`,
   keywords: [
     'about Intelet Enterprise', 'home appliances company Ghana', 'appliance retailer Accra',
     'Samsung Ghana dealer', 'Midea Ghana dealer', 'Bruhm Ghana dealer', 'Tamashi Ghana dealer',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: `About ${COMPANY.name}`,
-    description: `Ghana's home of quality home appliances. Visit our showroom at ${COMPANY.address.line1}, next to MTN on the N1 Highway.`,
+    description: `Ghana's home of quality home appliances. Visit us at Akweteyman (next to MTN on the N1 Highway) or Fise (Amasaman, adjacent to GCB Amasaman / Puma Filling Station).`,
     url: `${COMPANY.baseUrl}/about`,
     images: [{ url: '/preview.jpg', width: 1200, height: 630 }],
   },
@@ -77,9 +77,9 @@ export default function AboutPage() {
               VISIT OUR SHOWROOM
             </h2>
             <p className="leading-relaxed mb-4" style={{ color: COLORS.inkSoft }}>
-              Our showroom is at <strong style={{ color: COLORS.ink }}>{COMPANY.address.line1}</strong>,
-              next to MTN on the N1 Highway. Walk in to see the appliances in person, compare models, and
-              Pay with cash or Mobile Money.
+              We have two branches — <strong style={{ color: COLORS.ink }}>Akweteyman</strong> (next to MTN on the N1 Highway)
+              and <strong style={{ color: COLORS.ink }}>Fise</strong> (Amasaman, adjacent to GCB Amasaman Branch / Puma Filling Station).
+              Walk in to see the appliances in person, compare models, and pay with cash or Mobile Money.
             </p>
           </div>
         </div>

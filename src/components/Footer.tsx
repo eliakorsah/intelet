@@ -166,7 +166,7 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-2 text-xs font-mono text-slate-500">
             <span className="w-2 h-2 rounded-full bg-[#C8102E] animate-pulse" />
-            NOW OPEN · {COMPANY.address.line1}
+NOW OPEN · AKWETEYMAN &amp; FISE
           </div>
         </div>
       </div>

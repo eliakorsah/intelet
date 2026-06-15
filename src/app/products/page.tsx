@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: `Home Appliances | ${COMPANY.name} Ghana`,
-    description: `Fridges, freezers, washers, ACs and TVs — genuine brands with a 12-month warranty. Best prices at Lapaz-Akweteyman, Accra.`,
+    description: `Fridges, freezers, washers, ACs and TVs — genuine brands with a 12-month warranty. Best prices at our Akweteyman (next to MTN on the N1 Highway) and Fise (Amasaman) branches, Accra.`,
     url: `${COMPANY.baseUrl}/products`,
     images: [{ url: '/preview.jpg', width: 1200, height: 630 }],
   },

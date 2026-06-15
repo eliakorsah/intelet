@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     default: `${COMPANY.name} | Home Appliances Ghana`,
     template: `%s | ${COMPANY.name} Ghana`,
   },
-  description: `${COMPANY.name} is Ghana's trusted home-appliance retailer — Samsung, Midea, Bruhm, Tamashi, TCL, NASCO and Haier fridges, freezers, washing machines, ACs and TVs. Showroom at Lapaz-Akweteyman, next to MTN on the N1 Highway.`,
+  description: `${COMPANY.name} is Ghana's trusted home-appliance retailer — Samsung, Midea, Bruhm, Tamashi, TCL, NASCO and Haier fridges, freezers, washing machines, ACs and TVs. Two branches: Akweteyman (next to MTN on the N1 Highway) and Fise (Amasaman, adjacent to GCB Amasaman / Puma Filling Station).`,
   keywords: [
     'home appliances Ghana', 'fridges Ghana', 'washing machines Accra',
     'air conditioners Ghana', 'chest freezer Ghana', 'televisions Accra',
@@ -86,12 +86,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             description: `${COMPANY.name} — home appliances retailer in Ghana. Authorized dealer for Samsung, Midea, Bruhm, Tamashi, TCL, NASCO and Haier.`,
             telephone: [COMPANY.phones.primary, COMPANY.phones.secondary],
             email: COMPANY.email,
-            address: {
-              '@type': 'PostalAddress',
-              streetAddress: `${COMPANY.address.line1}, ${COMPANY.address.line2}`,
-              addressLocality: COMPANY.address.city,
-              addressCountry: 'GH',
-            },
+            address: [
+              {
+                '@type': 'PostalAddress',
+                streetAddress: `${COMPANY.address.line1}, ${COMPANY.address.line2}`,
+                addressLocality: COMPANY.address.city,
+                addressCountry: 'GH',
+              },
+              {
+                '@type': 'PostalAddress',
+                streetAddress: 'Fise, Amasaman — adjacent to GCB Amasaman Branch / Puma Filling Station',
+                addressLocality: 'Amasaman',
+                addressCountry: 'GH',
+              },
+            ],
             geo: { '@type': 'GeoCoordinates', latitude: 5.6037, longitude: -0.1870 },
             openingHoursSpecification: [
               { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday'], opens: '08:00', closes: '18:00' },

@@ -102,8 +102,9 @@ export default async function HomePage() {
                   Top <span style={{ color: RED }}>DEALS</span> on<br />Best-Selling Appliances
                 </h2>
                 <p className="mt-4 text-sm leading-relaxed max-w-lg" style={{ color: COLORS.inkSoft }}>
-                  Our best sellers at World Cup prices — Bruhm and more. Walk into our showroom at{' '}
-                  {COMPANY.address.line1}, next to MTN on the N1 Highway, or message us on WhatsApp.
+                  Our best sellers at World Cup prices — Bruhm and more. Walk into our{' '}
+                  <strong style={{ color: COLORS.ink }}>Akweteyman</strong> branch (next to MTN on the N1 Highway) or{' '}
+                  <strong style={{ color: COLORS.ink }}>Fise</strong> branch (Amasaman, adjacent to GCB Amasaman / Puma Filling Station), or message us on WhatsApp.
                 </p>
               </div>
               <a
@@ -247,9 +248,10 @@ export default async function HomePage() {
                   <span style={{ color: RED }}>Appliances</span>
                 </h2>
                 <p className="leading-relaxed mb-8 text-sm max-w-lg" style={{ color: COLORS.inkSoft }}>
-                  {COMPANY.name} is a trusted home-appliance retailer based at{' '}
-                  <strong style={{ color: COLORS.ink, fontWeight: 600 }}>{COMPANY.address.line1}</strong>,
-                  next to MTN on the N1 Highway. We partner directly with the brands you trust to bring you
+                  {COMPANY.name} is a trusted home-appliance retailer with two branches —{' '}
+                  <strong style={{ color: COLORS.ink, fontWeight: 600 }}>Akweteyman</strong> (next to MTN on the N1 Highway) and{' '}
+                  <strong style={{ color: COLORS.ink, fontWeight: 600 }}>Fise</strong> (Amasaman, adjacent to GCB Amasaman / Puma Filling Station).
+                  We partner directly with the brands you trust to bring you
                   genuine fridges, freezers, washing machines, ACs and televisions — at fair prices, with real
                   after-sales support and a 12-month warranty on every unit.
                 </p>

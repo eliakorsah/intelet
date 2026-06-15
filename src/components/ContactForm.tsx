@@ -26,7 +26,6 @@ export default function ContactForm() {
     { icon: Phone,         label: 'Secondary Phone', value: COMPANY.phones.secondaryFmt, href: `tel:${COMPANY.phones.secondary}` },
     { icon: MessageCircle, label: 'WhatsApp',        value: COMPANY.phones.primaryFmt,   href: whatsappLink() },
     { icon: Mail,          label: 'Email',           value: COMPANY.email,               href: `mailto:${COMPANY.email}` },
-    { icon: MapPin,        label: 'Showroom',        value: COMPANY.address.full,        href: null },
   ]
 
   return (
@@ -41,8 +40,9 @@ export default function ContactForm() {
             CONTACT <span style={{ color: RED }}>US</span>
           </h1>
           <p className="mt-3 max-w-xl mx-auto text-sm sm:text-base px-4" style={{ color: COLORS.inkSoft }}>
-            Reach us on WhatsApp, phone, or walk into our showroom at{' '}
-            <strong style={{ color: COLORS.ink }}>{COMPANY.address.line1}</strong>, next to MTN on the N1 Highway.
+            Reach us on WhatsApp or phone, or walk into either branch —{' '}
+            <strong style={{ color: COLORS.ink }}>Akweteyman</strong> (next to MTN on the N1 Highway) or{' '}
+            <strong style={{ color: COLORS.ink }}>Fise</strong> (Amasaman, adjacent to GCB Amasaman / Puma Filling Station).
           </p>
         </div>
 

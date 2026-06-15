@@ -160,7 +160,7 @@ export default function Navbar() {
             ))}
           </div>
           <span className="font-mono text-[10px] tracking-[0.25em] uppercase font-bold" style={{ color: RED }}>
-            {COMPANY.address.line1.toUpperCase()} &nbsp;·&nbsp; NEXT TO MTN ON THE N1 HIGHWAY
+            AKWETEYMAN · NEXT TO MTN ON THE N1 HIGHWAY &nbsp;|&nbsp; FISE · AMASAMAN (ADJ. GCB / PUMA)
           </span>
         </div>
       </div>
